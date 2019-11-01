@@ -16,9 +16,10 @@ namespace Domain
         public Model()
         {
             CreatedAt = DateTime.Now;
+            UpdateDate();
         }
 
-        public void UpdateData()
+        public void UpdateDate()
         {
             UpdatedAt = DateTime.Now;
         }

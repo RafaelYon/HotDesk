@@ -17,30 +17,30 @@ namespace Repository
             // Group Permission relationship
             modelBuilder.Entity<GroupPermission>()
                 .HasKey(x => new { x.GroupId, x.PermissionId });
-            
-            modelBuilder.Entity<GroupPermission>()
-                .HasOne(g => g.Group)
-                .WithMany(p => p.Permissions)
-                .HasForeignKey(x => x.GroupId);
 
             modelBuilder.Entity<GroupPermission>()
-                .HasOne(p => p.Permission)
-                .WithMany(g => g.Groups)
-                .HasForeignKey(x => x.PermissionId);
+                .HasOne(gp => gp.Group)
+                .WithMany(g => g.GroupPermission)
+                .HasForeignKey(gp => gp.GroupId);
+
+            modelBuilder.Entity<GroupPermission>()
+                .HasOne(gp => gp.Permission)
+                .WithMany(p => p.GroupPermission)
+                .HasForeignKey(gp => gp.PermissionId);
 
             // Group User relationship
             modelBuilder.Entity<GroupUser>()
                 .HasKey(x => new { x.GroupId, x.UserId });
 
             modelBuilder.Entity<GroupUser>()
-                .HasOne(g => g.Group)
-                .WithMany(u => u.Users)
-                .HasForeignKey(x => x.GroupId);
+                .HasOne(gu => gu.Group)
+                .WithMany(g => g.GroupUser)
+                .HasForeignKey(gu => gu.GroupId);
 
             modelBuilder.Entity<GroupUser>()
-                .HasOne(u => u.User)
-                .WithMany(g => g.Groups)
-                .HasForeignKey(x => x.UserId);
+                .HasOne(gu => gu.User)
+                .WithMany(u => u.GroupUser)
+                .HasForeignKey(gu => gu.UserId);
         }
     }
 }

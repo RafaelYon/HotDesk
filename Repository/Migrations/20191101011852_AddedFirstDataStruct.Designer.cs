@@ -10,7 +10,7 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20191101004646_AddedFirstDataStruct")]
+    [Migration("20191101011852_AddedFirstDataStruct")]
     partial class AddedFirstDataStruct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -111,12 +111,12 @@ namespace Repository.Migrations
             modelBuilder.Entity("Domain.GroupPermission", b =>
                 {
                     b.HasOne("Domain.Group", "Group")
-                        .WithMany("Permissions")
+                        .WithMany("GroupPermission")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.Permission", "Permission")
-                        .WithMany("Groups")
+                        .WithMany("GroupPermission")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -124,12 +124,12 @@ namespace Repository.Migrations
             modelBuilder.Entity("Domain.GroupUser", b =>
                 {
                     b.HasOne("Domain.Group", "Group")
-                        .WithMany("Users")
+                        .WithMany("GroupUser")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.User", "User")
-                        .WithMany("Groups")
+                        .WithMany("GroupUser")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

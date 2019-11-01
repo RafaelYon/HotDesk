@@ -30,11 +30,11 @@ namespace Domain
         [NotMapped]
         public string ConfirmPassword { get; set; }
 
-        public ICollection<GroupUser> Groups { get; set; }
+        public List<GroupUser> GroupUser { get; set; }
 
         public User()
         {
-            Groups = new List<GroupUser>();
+            GroupUser = new List<GroupUser>();
         }
     }
 }

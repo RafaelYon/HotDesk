@@ -9,11 +9,11 @@ namespace Domain
         [Required(ErrorMessage = "Campo obrigatório")]
         public string Name { get; set; }
 
-        public virtual ICollection<GroupPermission> Groups { get; set; }
+        public virtual List<GroupPermission> GroupPermission { get; set; }
 
         public Permission()
         {
-            Groups = new List<GroupPermission>();
+            GroupPermission = new List<GroupPermission>();
         }
     }
 }
