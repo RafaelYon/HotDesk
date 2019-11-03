@@ -18,6 +18,12 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+			modelBuilder.Entity<Permission>()
+				.HasIndex(p => p.Name).IsUnique();
+
+			modelBuilder.Entity<User>()
+				.HasIndex(u => u.Email).IsUnique();
+
             // Group Permission relationship
             modelBuilder.Entity<GroupPermission>()
                 .HasKey(x => new { x.GroupId, x.PermissionId });
@@ -51,6 +57,11 @@ namespace Repository
 
 			foreach (PermissionTypes permissionType in (PermissionTypes[])Enum.GetValues(typeof(PermissionTypes)))
 			{
+				if (permissionType == PermissionTypes.None)
+				{
+					continue;
+				}
+
 				permissions.Add(new Permission
 				{
 					Id = (int) permissionType,

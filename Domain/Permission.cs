@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain
 {
 	public enum PermissionTypes
 	{
+		None,
+		
 		// Issue actions
 		[Display(Description = "Criar chamado")]
-		IssueCreate = 1,
+		IssueCreate,
 
 		[Display(Description = "Assumir chamado")]
 		IssueAccept,
@@ -32,10 +35,26 @@ namespace Domain
 	public class Permission : Model
     {
         [Display(Name = "Nome")]
-        public string Name { get; set; }
+		[MaxLength(256, ErrorMessage = "O nome não pode possuir mais de 256 caracteres")]
+		public string Name { get; set; }
 
 		[Display(Name = "Descrição")]
 		public string Description { get; set; }
+
+		private PermissionTypes _type;
+
+		public PermissionTypes Type
+		{
+			get
+			{
+				if (_type == PermissionTypes.None && !String.IsNullOrWhiteSpace(Name))
+				{
+					Enum.TryParse(Name, out _type);
+				}
+
+				return _type;
+			}
+		}
 
 		public virtual List<GroupPermission> GroupPermission { get; set; }
 
