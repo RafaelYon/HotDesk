@@ -7,10 +7,8 @@ namespace Domain
 {
     public class GroupUser
     {
-        [Key]
         public int GroupId { get; set; }
 
-        [Key]
         public int UserId { get; set; }
 
         public Group Group { get; set; }

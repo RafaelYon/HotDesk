@@ -1,5 +1,9 @@
 ﻿using Domain;
+using Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Repository
 {
@@ -41,6 +45,21 @@ namespace Repository
                 .HasOne(gu => gu.User)
                 .WithMany(u => u.GroupUser)
                 .HasForeignKey(gu => gu.UserId);
-        }
-    }
+
+			// Seeding data
+			List<Permission> permissions = new List<Permission>();
+
+			foreach (PermissionTypes permissionType in (PermissionTypes[])Enum.GetValues(typeof(PermissionTypes)))
+			{
+				permissions.Add(new Permission
+				{
+					Id = (int) permissionType,
+					Name = permissionType.ToString(),
+					Description = permissionType.GetFieldAttribute<DisplayAttribute>().Description
+				});
+			}
+
+			modelBuilder.Entity<Permission>().HasData(permissions.ToArray());
+		}
+	}
 }
