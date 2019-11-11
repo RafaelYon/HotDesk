@@ -6,6 +6,7 @@ using Domain;
 using Domain.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Repository;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -46,7 +47,17 @@ namespace Web.Controllers
 
 			//_context.SaveChanges();
 
-			return View();
+			//return View();
+
+			// {"salt":"54zeseRa2W/qdd7Q8DMS4w==","password":"a1eTJWumhauSAw1xlIcBgMiUQ2hm9AZx+6AUIxTf/bhQGLKoRVFxi04zkCCpdnhk7Cgf8RwIdAbqiarNQQI13A=="}
+
+			var salt = Convert.FromBase64String("54zeseRa2W/qdd7Q8DMS4w==");
+
+			return Ok(new
+			{
+				salt = Convert.ToBase64String(salt),
+				password = PasswordHelper.Hash("banana", salt)
+			});
         }
     }
 }

@@ -5,7 +5,8 @@ namespace Domain
 {
     public abstract class Model
     {
-        public int Id { get; set; }
+		[Display(AutoGenerateField = true)]
+		public int Id { get; set; }
 
         [Display(Name = "Criado em")]
         public DateTime CreatedAt { get; set; }

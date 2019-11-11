@@ -30,7 +30,11 @@ namespace Domain
         [NotMapped]
         public string ConfirmPassword { get; set; }
 
-        public List<GroupUser> GroupUser { get; set; }
+		[Display(AutoGenerateField = true)]
+		[Required]
+		public string PasswordSalt { get; set; }
+
+		public List<GroupUser> GroupUser { get; set; }
 
         public User()
         {
