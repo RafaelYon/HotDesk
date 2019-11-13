@@ -14,7 +14,6 @@ namespace Domain
         [Required(ErrorMessage = "Campo obrigatório")]
         [EmailAddress(ErrorMessage = "E-mail inválido")]
         [MaxLength(256, ErrorMessage = "O e-mail não pode possuir mais de 256 caracteres")]
-        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [Display(Name = "Senha")]
@@ -29,10 +28,6 @@ namespace Domain
         [Compare("Password", ErrorMessage = "A senhas não concidem")]
         [NotMapped]
         public string ConfirmPassword { get; set; }
-
-		[Display(AutoGenerateField = true)]
-		[Required]
-		public string PasswordSalt { get; set; }
 
 		public List<GroupUser> GroupUser { get; set; }
 

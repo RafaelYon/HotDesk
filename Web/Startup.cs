@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
+using Repository.DAL;
 
 namespace Web
 {
@@ -35,6 +36,8 @@ namespace Web
 
             services.AddDbContext<Context>
                 (options => options.UseSqlServer(Configuration.GetConnectionString("RW")));
+
+            services.AddScoped<UserDAO>();
 
 			// Session configuration need be set before MVC config
 			services.AddSession();

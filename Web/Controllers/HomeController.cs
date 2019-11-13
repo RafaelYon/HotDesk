@@ -6,7 +6,6 @@ using Domain;
 using Domain.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Repository;
-using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -21,43 +20,33 @@ namespace Web.Controllers
 
 		public IActionResult Index()
         {
-			//var permission = new Permission()
-			//{
-			//	Name = "Criar chamado"
-			//};
+            //var permission = new Permission()
+            //{
+            //	Name = "Criar chamado"
+            //};
 
-			//_context.Permissions.Add(permission);
+            //_context.Permissions.Add(permission);
 
-			//var group = new Group()
-			//{
-			//	Name = "Cliente",
-			//};
+            //var group = new Group()
+            //{
+            //	Name = "Cliente",
+            //};
 
-			//_context.Groups.Add(group);
+            //_context.Groups.Add(group);
 
-			//_context.SaveChanges();
+            //_context.SaveChanges();
 
-			//group.GroupPermission.Add(new GroupPermission()
-			//{
-			//	PermissionId = permission.Id,
-			//	GroupId = group.Id
-			//});
+            //group.GroupPermission.Add(new GroupPermission()
+            //{
+            //	PermissionId = permission.Id,
+            //	GroupId = group.Id
+            //});
 
-			//_context.Groups.Update(group);
+            //_context.Groups.Update(group);
 
-			//_context.SaveChanges();
+            //_context.SaveChanges();
 
-			//return View();
-
-			// {"salt":"54zeseRa2W/qdd7Q8DMS4w==","password":"a1eTJWumhauSAw1xlIcBgMiUQ2hm9AZx+6AUIxTf/bhQGLKoRVFxi04zkCCpdnhk7Cgf8RwIdAbqiarNQQI13A=="}
-
-			var salt = Convert.FromBase64String("54zeseRa2W/qdd7Q8DMS4w==");
-
-			return Ok(new
-			{
-				salt = Convert.ToBase64String(salt),
-				password = PasswordHelper.Hash("banana", salt)
-			});
+            return View();
         }
     }
 }
