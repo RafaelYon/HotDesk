@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain;
-using Domain.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Repository;
+using Web.Models;
 
 namespace Web.Controllers
 {
-    public class HomeController : Controller
+	public class HomeController : Web.Controllers.Controller
     {
 		private Context _context;
 
@@ -20,33 +15,33 @@ namespace Web.Controllers
 
 		public IActionResult Index()
         {
-            //var permission = new Permission()
-            //{
-            //	Name = "Criar chamado"
-            //};
+			//var permission = new Permission()
+			//{
+			//	Name = "Criar chamado"
+			//};
 
-            //_context.Permissions.Add(permission);
+			//_context.Permissions.Add(permission);
 
-            //var group = new Group()
-            //{
-            //	Name = "Cliente",
-            //};
+			//var group = new Group()
+			//{
+			//	Name = "Cliente",
+			//};
 
-            //_context.Groups.Add(group);
+			//_context.Groups.Add(group);
 
-            //_context.SaveChanges();
+			//_context.SaveChanges();
 
-            //group.GroupPermission.Add(new GroupPermission()
-            //{
-            //	PermissionId = permission.Id,
-            //	GroupId = group.Id
-            //});
+			//group.GroupPermission.Add(new GroupPermission()
+			//{
+			//	PermissionId = permission.Id,
+			//	GroupId = group.Id
+			//});
 
-            //_context.Groups.Update(group);
+			//_context.Groups.Update(group);
 
-            //_context.SaveChanges();
+			//_context.SaveChanges();
 
-            return View();
+			return View();
         }
-    }
+	}
 }

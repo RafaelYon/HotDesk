@@ -6,11 +6,11 @@ using Repository.DAL;
 
 namespace Web.Controllers
 {
-    public class UsersController : Controller
+    public class UserController : Controller
     {
         private readonly UserDAO _userDAO;
 
-        public UsersController(UserDAO userDAO)
+        public UserController(UserDAO userDAO)
         {
             _userDAO = userDAO;
         }
@@ -64,6 +64,11 @@ namespace Web.Controllers
 
             return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
         }
+
+		public IActionResult Login()
+		{
+			return View();
+		}
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
