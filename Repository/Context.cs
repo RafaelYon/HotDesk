@@ -1,15 +1,10 @@
 ﻿using Domain;
-using Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Repository
 {
-    public class Context : DbContext
+	public class Context : DbContext
     {
-        public DbSet<Permission> Permissions { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -18,25 +13,17 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-			modelBuilder.Entity<Permission>()
-				.HasIndex(p => p.Name).IsUnique();
-
 			modelBuilder.Entity<User>()
 				.HasIndex(u => u.Email).IsUnique();
 
-            // Group Permission relationship
-            modelBuilder.Entity<GroupPermission>()
-                .HasKey(x => new { x.GroupId, x.PermissionId });
+			// GroupPermission relationship
+			modelBuilder.Entity<GroupPermission>()
+				.HasKey(x => new { x.GroupId, x.Permission });
 
-            modelBuilder.Entity<GroupPermission>()
-                .HasOne(gp => gp.Group)
-                .WithMany(g => g.GroupPermission)
-                .HasForeignKey(gp => gp.GroupId);
-
-            modelBuilder.Entity<GroupPermission>()
-                .HasOne(gp => gp.Permission)
-                .WithMany(p => p.GroupPermission)
-                .HasForeignKey(gp => gp.PermissionId);
+			modelBuilder.Entity<GroupPermission>()
+				.HasOne(gp => gp.Group)
+				.WithMany(g => g.GroupPermissions)
+				.HasForeignKey(gp => gp.GroupId);
 
             // Group User relationship
             modelBuilder.Entity<GroupUser>()
@@ -51,26 +38,6 @@ namespace Repository
                 .HasOne(gu => gu.User)
                 .WithMany(u => u.GroupUser)
                 .HasForeignKey(gu => gu.UserId);
-
-			// Seeding data
-			List<Permission> permissions = new List<Permission>();
-
-			foreach (PermissionTypes permissionType in (PermissionTypes[])Enum.GetValues(typeof(PermissionTypes)))
-			{
-				if (permissionType == PermissionTypes.None)
-				{
-					continue;
-				}
-
-				permissions.Add(new Permission
-				{
-					Id = (int) permissionType,
-					Name = permissionType.ToString(),
-					Description = permissionType.GetFieldAttribute<DisplayAttribute>().Description
-				});
-			}
-
-			modelBuilder.Entity<Permission>().HasData(permissions.ToArray());
 		}
 	}
 }

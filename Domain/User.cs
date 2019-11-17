@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Domain
 {
@@ -35,5 +36,25 @@ namespace Domain
         {
             GroupUser = new List<GroupUser>();
         }
+
+		public List<Permission> GetPermissions()
+		{
+			var result = new List<Permission>();
+
+			foreach (var groupPermissions in GroupUser.Select(x => x.Group.GroupPermissions).ToArray())
+			{
+				foreach (GroupPermission groupPermission in groupPermissions)
+				{
+					if (result.Contains(groupPermission.Permission))
+					{
+						continue;
+					}
+
+					result.Add(groupPermission.Permission);
+				}
+			}
+
+			return result;
+		}
     }
 }

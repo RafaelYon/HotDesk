@@ -9,13 +9,13 @@ namespace Domain
         [Required(ErrorMessage = "Campo obrigatório")]
         public string Name { get; set; }
 
-        public List<GroupPermission> GroupPermission { get; set; }
+		public List<GroupPermission> GroupPermissions { get; set; }
 
         public virtual List<GroupUser> GroupUser { get; set; }
 
         public Group()
         {
-            GroupPermission = new List<GroupPermission>();
+			GroupPermissions = new List<GroupPermission>();
             GroupUser = new List<GroupUser>();
         }
     }

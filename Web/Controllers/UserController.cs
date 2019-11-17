@@ -3,6 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Repository.DAL;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
@@ -16,6 +22,7 @@ namespace Web.Controllers
         }
 
         // GET: Users/Details/5
+		[Authorize(Policy = "ManageAccounts")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,6 +41,7 @@ namespace Web.Controllers
         }
 
         // GET: Users/Create
+		[AllowAnonymous]
         public IActionResult Register()
         {
             return View();
@@ -44,6 +52,7 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+		[AllowAnonymous]
         public async Task<IActionResult> Register([Bind("Name,Email,Password,ConfirmPassword")] User user)
         {
             if (!ModelState.IsValid)
@@ -61,16 +70,76 @@ namespace Web.Controllers
             user.ConfirmPassword = string.Empty;
 
             await _userDAO.Save(user);
+			await AuthenticateUser(user);
 
-            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
+            return RedirectToAction("Index", "Home");
         }
 
+		[AllowAnonymous]
 		public IActionResult Login()
 		{
 			return View();
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[AllowAnonymous]
+		public async Task<IActionResult> Login([Bind("Email,Password")] User user)
+		{
+			var dbUser = await _userDAO.FindByEmail(user.Email);
+
+			if (!BCrypt.Net.BCrypt.Verify(user.Password, dbUser.Password))
+			{
+				ModelState.AddModelError(string.Empty, "Credenciais inválidas");
+				user.Password = string.Empty;
+
+				return View(user);
+			}
+
+			await AuthenticateUser(dbUser);
+
+			return RedirectToAction("Index", "Home");
+		}
+
+		protected async Task AuthenticateUser(User user)
+		{
+			var claims = new List<Claim>()
+			{
+				new Claim("Id", user.Id.ToString()),
+				new Claim(ClaimTypes.Name, user.Name),
+				new Claim(ClaimTypes.Email, user.Email)
+			};
+
+			foreach (Permission permission in user.GetPermissions())
+			{
+				claims.Add(new Claim(permission.ToString(), permission.ToString()));
+			}
+
+			var claimsIdentify = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+			var authProperties = new AuthenticationProperties
+			{
+				IssuedUtc = DateTime.Now
+			};
+
+			await HttpContext.SignInAsync(
+				CookieAuthenticationDefaults.AuthenticationScheme,
+				new ClaimsPrincipal(claimsIdentify),
+				authProperties);
+		}
+
+		[HttpPost]
+		[Authorize]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Logout()
+		{
+			await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+			return RedirectToAction("Index", "Home");
+		}
+
         // GET: Users/Edit/5
+		[Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -92,6 +161,7 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+		[Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Name,Email,Password,ConfirmPassword,Id")] User user)
         {
             if (id != user.Id)

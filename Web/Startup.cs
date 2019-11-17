@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,7 +47,34 @@ namespace Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie();
+				.AddCookie(options =>
+				{
+					options.LoginPath = PathString.FromUriComponent("/User/Login");
+				});
+
+			services.AddAuthorization(options =>
+			{
+				options.AddPolicy(Permission.IssueAccept.ToString(), 
+					p => p.RequireClaim(Permission.IssueAccept.ToString()));
+
+				options.AddPolicy(Permission.IssueClose.ToString(),
+					p => p.RequireClaim(Permission.IssueClose.ToString()));
+
+				options.AddPolicy(Permission.IssueCreate.ToString(),
+					p => p.RequireClaim(Permission.IssueCreate.ToString()));
+
+				options.AddPolicy(Permission.IssueEscalate.ToString(),
+					p => p.RequireClaim(Permission.IssueEscalate.ToString()));
+
+				options.AddPolicy(Permission.IssueRateAssistence.ToString(),
+					p => p.RequireClaim(Permission.IssueRateAssistence.ToString()));
+
+				options.AddPolicy(Permission.ManageAccounts.ToString(),
+					p => p.RequireClaim(Permission.ManageAccounts.ToString()));
+
+				options.AddPolicy(Permission.ManageGroups.ToString(),
+					p => p.RequireClaim(Permission.ManageGroups.ToString()));
+			});
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,7 +94,7 @@ namespace Web
 			app.UseSession();
 			app.UseAuthentication();
 
-            app.UseMvc(routes =>
+			app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
