@@ -6,7 +6,12 @@ namespace Repository
 	public class Context : DbContext
     {
         public DbSet<Group> Groups { get; set; }
+
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Issue> Issues { get; set; }
 
         public Context(DbContextOptions<Context> options)
             : base(options) { }
@@ -16,8 +21,14 @@ namespace Repository
 			modelBuilder.Entity<User>()
 				.HasIndex(u => u.Email).IsUnique();
 
-			// GroupPermission relationship
-			modelBuilder.Entity<GroupPermission>()
+            modelBuilder.Entity<Category>()
+                .HasIndex(x => x.Name).IsUnique();
+
+            modelBuilder.Entity<Group>()
+                .HasIndex(x => x.Name).IsUnique();
+
+            // GroupPermission relationship
+            modelBuilder.Entity<GroupPermission>()
 				.HasKey(x => new { x.GroupId, x.Permission });
 
 			modelBuilder.Entity<GroupPermission>()

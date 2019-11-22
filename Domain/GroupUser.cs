@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Domain
 {
@@ -14,5 +11,15 @@ namespace Domain
         public Group Group { get; set; }
 
         public User User { get; set; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(GroupId, UserId, GetType());
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj?.GetHashCode();
+        }
     }
 }

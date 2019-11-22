@@ -9,7 +9,10 @@ namespace Domain
         [Required(ErrorMessage = "Campo obrigatório")]
         public string Name { get; set; }
 
-		public List<GroupPermission> GroupPermissions { get; set; }
+        [Display(Name = "Padrão")]
+        public bool Default { get; set; }
+
+        public List<GroupPermission> GroupPermissions { get; set; }
 
         public virtual List<GroupUser> GroupUser { get; set; }
 

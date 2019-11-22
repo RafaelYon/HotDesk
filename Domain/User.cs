@@ -30,31 +30,39 @@ namespace Domain
         [NotMapped]
         public string ConfirmPassword { get; set; }
 
-		public List<GroupUser> GroupUser { get; set; }
+        public string Image { get; set; }
+
+        public List<GroupUser> GroupUser { get; set; }
+
+        public virtual List<Issue> IssuesCreated { get; set; }
+
+        public virtual List<Issue> IssuesAssigned { get; set; }
+
+        public virtual List<IssuesComment> IssuesComments { get; set; }
 
         public User()
         {
             GroupUser = new List<GroupUser>();
         }
 
-		public List<Permission> GetPermissions()
-		{
-			var result = new List<Permission>();
+        public List<Permission> GetPermissions()
+        {
+            var result = new List<Permission>();
 
-			foreach (var groupPermissions in GroupUser.Select(x => x.Group.GroupPermissions).ToArray())
-			{
-				foreach (GroupPermission groupPermission in groupPermissions)
-				{
-					if (result.Contains(groupPermission.Permission))
-					{
-						continue;
-					}
+            foreach (var groupPermissions in GroupUser.Select(x => x.Group.GroupPermissions).ToArray())
+            {
+                foreach (GroupPermission groupPermission in groupPermissions)
+                {
+                    if (result.Contains(groupPermission.Permission))
+                    {
+                        continue;
+                    }
 
-					result.Add(groupPermission.Permission);
-				}
-			}
+                    result.Add(groupPermission.Permission);
+                }
+            }
 
-			return result;
-		}
+            return result;
+        }
     }
 }
