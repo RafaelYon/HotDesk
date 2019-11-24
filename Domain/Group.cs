@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain
 {
-    public class Group : Model
+    public class Group : Model, ISeed<Group>
     {
         [Display(Name = "Nome")]
         [Required(ErrorMessage = "Campo obrigatório")]
@@ -21,5 +22,37 @@ namespace Domain
 			GroupPermissions = new List<GroupPermission>();
             GroupUser = new List<GroupUser>();
         }
-    }
+
+		public List<Group> GetSeedData()
+		{
+			var groups = new List<Group>();
+
+			groups.Add(new Group
+			{
+				Id = 1,
+				CreatedAt = new DateTime(2019, 11, 24, 14, 34, 00),
+				UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 00),
+				Name = "Default",
+				Default = true
+			});
+
+			groups.Add(new Group
+			{
+				Id = 2,
+				CreatedAt = new DateTime(2019, 11, 24, 14, 34, 00),
+				UpdatedAt = new DateTime(2019, 11, 24, 14, 24, 00),
+				Name = "Support"
+			});
+
+			groups.Add(new Group
+			{
+				Id = 3,
+				CreatedAt = new DateTime(2019, 11, 24, 14, 34, 00),
+				UpdatedAt = new DateTime(2019, 11, 24, 14, 24, 00),
+				Name = "Admin"
+			});
+
+			return groups;
+		}
+	}
 }

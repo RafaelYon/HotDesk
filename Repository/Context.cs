@@ -1,5 +1,7 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace Repository
 {
@@ -7,7 +9,9 @@ namespace Repository
     {
         public DbSet<Group> Groups { get; set; }
 
-        public DbSet<User> Users { get; set; }
+		public DbSet<GroupPermission> GroupPermissions { get; set; }
+
+		public DbSet<User> Users { get; set; }
 
         public DbSet<Category> Categories { get; set; }
 
@@ -49,6 +53,27 @@ namespace Repository
                 .HasOne(gu => gu.User)
                 .WithMany(u => u.GroupUser)
                 .HasForeignKey(gu => gu.UserId);
+
+			// User Issue relationship
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.IssuesCreated)
+				.WithOne(i => i.Owner)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.IssuesAssigned)
+				.WithOne(i => i.Responsible)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			// Issue IssueComment relationship
+			modelBuilder.Entity<Issue>()
+				.HasMany(i => i.Comments)
+				.WithOne(c => c.Issue)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			// Seding data
+			modelBuilder.Entity<Group>().HasData((new Group()).GetSeedData().ToArray());
+			modelBuilder.Entity<GroupPermission>().HasData((new GroupPermission()).GetSeedData().ToArray());
 		}
 	}
 }

@@ -16,17 +16,17 @@ namespace Domain
 		[Display(Description = "Encerrar chamado")]
 		IssueClose,
 
-		[Display(Description = "Escalar chamado")]
-		IssueEscalate,
-
 		[Display(Description = "Avaliar assitencia")]
 		IssueRateAssistence,
 
-		// User manager actions
+		// Manager actions
 		[Display(Description = "Gerenciar contas")]
 		ManageAccounts,
 
 		[Display(Description = "Gerenciar grupos")]
-		ManageGroups
+		ManageGroups,
+
+		[Display(Description = "Gerenciar categorias")]
+		ManageCategories
 	};
 }

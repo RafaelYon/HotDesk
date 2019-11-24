@@ -63,9 +63,6 @@ namespace Web
 				options.AddPolicy(Permission.IssueCreate.ToString(),
 					p => p.RequireClaim(Permission.IssueCreate.ToString()));
 
-				options.AddPolicy(Permission.IssueEscalate.ToString(),
-					p => p.RequireClaim(Permission.IssueEscalate.ToString()));
-
 				options.AddPolicy(Permission.IssueRateAssistence.ToString(),
 					p => p.RequireClaim(Permission.IssueRateAssistence.ToString()));
 
@@ -74,6 +71,9 @@ namespace Web
 
 				options.AddPolicy(Permission.ManageGroups.ToString(),
 					p => p.RequireClaim(Permission.ManageGroups.ToString()));
+
+				options.AddPolicy(Permission.ManageCategories.ToString(),
+					p => p.RequireClaim(Permission.ManageCategories.ToString()));
 			});
 		}
 
