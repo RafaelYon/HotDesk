@@ -13,7 +13,7 @@ namespace Domain
         [Display(Name = "Padrão")]
         public bool Default { get; set; }
 
-        public List<GroupPermission> GroupPermissions { get; set; }
+        public virtual List<GroupPermission> GroupPermissions { get; set; }
 
         public virtual List<GroupUser> GroupUser { get; set; }
 

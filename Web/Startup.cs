@@ -35,10 +35,16 @@ namespace Web
                 options.MinimumSameSitePolicy = SameSiteMode.Strict;
             });
 
-            services.AddDbContext<Context>
-                (options => options.UseSqlServer(Configuration.GetConnectionString("RW")));
+			services.AddDbContext<Context>
+				(options => options
+					.UseSqlServer(Configuration.GetConnectionString("RW"))
+					.UseLazyLoadingProxies());
 
             services.AddScoped<UserDAO>();
+			services.AddScoped<CategoryDAO>();
+			services.AddScoped<GroupDAO>();
+
+			services.AddScoped<UserRepository>();
 
 			// Session configuration need be set before MVC config
 			services.AddSession();
@@ -54,26 +60,26 @@ namespace Web
 
 			services.AddAuthorization(options =>
 			{
-				options.AddPolicy(Permission.IssueAccept.ToString(), 
-					p => p.RequireClaim(Permission.IssueAccept.ToString()));
+				options.AddPolicy(PermissionType.IssueAccept.ToString(), 
+					p => p.RequireClaim(PermissionType.IssueAccept.ToString()));
 
-				options.AddPolicy(Permission.IssueClose.ToString(),
-					p => p.RequireClaim(Permission.IssueClose.ToString()));
+				options.AddPolicy(PermissionType.IssueClose.ToString(),
+					p => p.RequireClaim(PermissionType.IssueClose.ToString()));
 
-				options.AddPolicy(Permission.IssueCreate.ToString(),
-					p => p.RequireClaim(Permission.IssueCreate.ToString()));
+				options.AddPolicy(PermissionType.IssueCreate.ToString(),
+					p => p.RequireClaim(PermissionType.IssueCreate.ToString()));
 
-				options.AddPolicy(Permission.IssueRateAssistence.ToString(),
-					p => p.RequireClaim(Permission.IssueRateAssistence.ToString()));
+				options.AddPolicy(PermissionType.IssueRateAssistence.ToString(),
+					p => p.RequireClaim(PermissionType.IssueRateAssistence.ToString()));
 
-				options.AddPolicy(Permission.ManageAccounts.ToString(),
-					p => p.RequireClaim(Permission.ManageAccounts.ToString()));
+				options.AddPolicy(PermissionType.ManageAccounts.ToString(),
+					p => p.RequireClaim(PermissionType.ManageAccounts.ToString()));
 
-				options.AddPolicy(Permission.ManageGroups.ToString(),
-					p => p.RequireClaim(Permission.ManageGroups.ToString()));
+				options.AddPolicy(PermissionType.ManageGroups.ToString(),
+					p => p.RequireClaim(PermissionType.ManageGroups.ToString()));
 
-				options.AddPolicy(Permission.ManageCategories.ToString(),
-					p => p.RequireClaim(Permission.ManageCategories.ToString()));
+				options.AddPolicy(PermissionType.ManageCategories.ToString(),
+					p => p.RequireClaim(PermissionType.ManageCategories.ToString()));
 			});
 		}
 

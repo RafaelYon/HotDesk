@@ -40,6 +40,21 @@ namespace Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Permissions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    UpdatedAt = table.Column<DateTime>(nullable: false),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permissions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -62,15 +77,21 @@ namespace Repository.Migrations
                 columns: table => new
                 {
                     GroupId = table.Column<int>(nullable: false),
-                    Permission = table.Column<int>(nullable: false)
+                    PermissionId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupPermissions", x => new { x.GroupId, x.Permission });
+                    table.PrimaryKey("PK_GroupPermissions", x => new { x.GroupId, x.PermissionId });
                     table.ForeignKey(
                         name: "FK_GroupPermissions_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupPermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "Permissions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -170,32 +191,41 @@ namespace Repository.Migrations
             migrationBuilder.InsertData(
                 table: "Groups",
                 columns: new[] { "Id", "CreatedAt", "Default", "Name", "UpdatedAt" },
-                values: new object[] { 1, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), true, "Default", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[,]
+                {
+                    { 1, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), true, "Default", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), false, "Support", new DateTime(2019, 11, 24, 14, 24, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), false, "Admin", new DateTime(2019, 11, 24, 14, 24, 0, 0, DateTimeKind.Unspecified) }
+                });
 
             migrationBuilder.InsertData(
-                table: "Groups",
-                columns: new[] { "Id", "CreatedAt", "Default", "Name", "UpdatedAt" },
-                values: new object[] { 2, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), false, "Support", new DateTime(2019, 11, 24, 14, 24, 0, 0, DateTimeKind.Unspecified) });
-
-            migrationBuilder.InsertData(
-                table: "Groups",
-                columns: new[] { "Id", "CreatedAt", "Default", "Name", "UpdatedAt" },
-                values: new object[] { 3, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), false, "Admin", new DateTime(2019, 11, 24, 14, 24, 0, 0, DateTimeKind.Unspecified) });
+                table: "Permissions",
+                columns: new[] { "Id", "CreatedAt", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "IssueCreate", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "IssueAccept", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "IssueClose", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "IssueRateAssistence", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "ManageAccounts", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 6, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "ManageGroups", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                    { 7, new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), "ManageCategories", new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) }
+                });
 
             migrationBuilder.InsertData(
                 table: "GroupPermissions",
-                columns: new[] { "GroupId", "Permission" },
+                columns: new[] { "GroupId", "PermissionId" },
                 values: new object[,]
                 {
                     { 1, 1 },
-                    { 1, 3 },
-                    { 1, 4 },
                     { 2, 1 },
-                    { 2, 2 },
-                    { 2, 3 },
                     { 3, 1 },
+                    { 2, 2 },
                     { 3, 2 },
+                    { 1, 3 },
+                    { 2, 3 },
                     { 3, 3 },
+                    { 1, 4 },
                     { 3, 5 },
                     { 3, 6 },
                     { 3, 7 }
@@ -206,6 +236,11 @@ namespace Repository.Migrations
                 table: "Categories",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupPermissions_PermissionId",
+                table: "GroupPermissions",
+                column: "PermissionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Groups_Name",
@@ -260,6 +295,9 @@ namespace Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "IssuesComment");
+
+            migrationBuilder.DropTable(
+                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "Groups");

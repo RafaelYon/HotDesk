@@ -23,7 +23,7 @@ namespace Domain
 
         [Display(Name = "Categoria")]
         [Required(ErrorMessage = "Campo obrigatório")]
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
         [Display(Name = "Avaliação")]
         public float? Rate { get; set; }
@@ -31,10 +31,10 @@ namespace Domain
         public IssueStatus Status { get; set; }
 
         [Display(Name = "Solicitante")]
-        public User Owner { get; set; }
+        public virtual User Owner { get; set; }
 
         [Display(Name = "Responsável")]
-        public User Responsible { get; set; }
+        public virtual User Responsible { get; set; }
 
         public virtual List<IssuesComment> Comments { get; set; }
 

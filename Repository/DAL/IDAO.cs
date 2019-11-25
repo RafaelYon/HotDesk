@@ -9,7 +9,7 @@ namespace Repository.DAL
 
         Task Delete(T model);
 
-        Task<List<T>> GetAll(T model);
+        Task<List<T>> GetAll();
 
         Task<T> Find(params object[] keysValues);
     }

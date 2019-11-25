@@ -7,18 +7,20 @@ namespace Domain
     {
         public int GroupId { get; set; }
 
-        public Group Group { get; set; }
+		public int PermissionId { get; set; }
 
-        public Permission Permission { get; set; }
+		public virtual Group Group { get; set; }
 
-        public override bool Equals(object obj)
+		public virtual Permission Permission { get; set; }
+
+		public override bool Equals(object obj)
         {
             return GetHashCode() == obj?.GetHashCode();
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(GroupId, Permission, GetType());
+            return HashCode.Combine(GroupId, PermissionId, GetType());
         }
 
 		public List<GroupPermission> GetSeedData()
@@ -29,75 +31,75 @@ namespace Domain
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 1,
-				Permission = Permission.IssueCreate
+				PermissionId = (int) PermissionType.IssueCreate
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 1,
-				Permission = Permission.IssueClose
+				PermissionId = (int) PermissionType.IssueClose
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 1,
-				Permission = Permission.IssueRateAssistence
+				PermissionId = (int) PermissionType.IssueRateAssistence
 			});
 
 			// Support permissions:
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 2,
-				Permission = Permission.IssueCreate
+				PermissionId = (int) PermissionType.IssueCreate
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 2,
-				Permission = Permission.IssueAccept
+				PermissionId = (int) PermissionType.IssueAccept
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 2,
-				Permission = Permission.IssueClose
+				PermissionId = (int) PermissionType.IssueClose
 			});
 
 			// Admin permissions:
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.IssueCreate
+				PermissionId = (int) PermissionType.IssueCreate
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.IssueAccept
+				PermissionId = (int) PermissionType.IssueAccept
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.IssueClose
+				PermissionId = (int) PermissionType.IssueClose
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.ManageAccounts
+				PermissionId = (int) PermissionType.ManageAccounts
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.ManageGroups
+				PermissionId = (int) PermissionType.ManageGroups
 			});
 
 			groupPermissions.Add(new GroupPermission
 			{
 				GroupId = 3,
-				Permission = Permission.ManageCategories
+				PermissionId = (int) PermissionType.ManageCategories
 			});
 
 			return groupPermissions;

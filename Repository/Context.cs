@@ -7,7 +7,9 @@ namespace Repository
 {
 	public class Context : DbContext
     {
-        public DbSet<Group> Groups { get; set; }
+		public DbSet<Permission> Permissions { get; set; }
+
+		public DbSet<Group> Groups { get; set; }
 
 		public DbSet<GroupPermission> GroupPermissions { get; set; }
 
@@ -33,12 +35,17 @@ namespace Repository
 
             // GroupPermission relationship
             modelBuilder.Entity<GroupPermission>()
-				.HasKey(x => new { x.GroupId, x.Permission });
+				.HasKey(x => new { x.GroupId, x.PermissionId });
 
 			modelBuilder.Entity<GroupPermission>()
 				.HasOne(gp => gp.Group)
 				.WithMany(g => g.GroupPermissions)
 				.HasForeignKey(gp => gp.GroupId);
+
+			modelBuilder.Entity<GroupPermission>()
+				.HasOne(gp => gp.Permission)
+				.WithMany(p => p.GroupPermissions)
+				.HasForeignKey(gp => gp.PermissionId);
 
             // Group User relationship
             modelBuilder.Entity<GroupUser>()
@@ -72,6 +79,7 @@ namespace Repository
 				.OnDelete(DeleteBehavior.Restrict);
 
 			// Seding data
+			modelBuilder.Entity<Permission>().HasData((new Permission()).GetSeedData().ToArray());
 			modelBuilder.Entity<Group>().HasData((new Group()).GetSeedData().ToArray());
 			modelBuilder.Entity<GroupPermission>().HasData((new GroupPermission()).GetSeedData().ToArray());
 		}

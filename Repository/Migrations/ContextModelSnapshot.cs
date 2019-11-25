@@ -73,25 +73,27 @@ namespace Repository.Migrations
                 {
                     b.Property<int>("GroupId");
 
-                    b.Property<int>("Permission");
+                    b.Property<int>("PermissionId");
 
-                    b.HasKey("GroupId", "Permission");
+                    b.HasKey("GroupId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
 
                     b.ToTable("GroupPermissions");
 
                     b.HasData(
-                        new { GroupId = 1, Permission = 1 },
-                        new { GroupId = 1, Permission = 3 },
-                        new { GroupId = 1, Permission = 4 },
-                        new { GroupId = 2, Permission = 1 },
-                        new { GroupId = 2, Permission = 2 },
-                        new { GroupId = 2, Permission = 3 },
-                        new { GroupId = 3, Permission = 1 },
-                        new { GroupId = 3, Permission = 2 },
-                        new { GroupId = 3, Permission = 3 },
-                        new { GroupId = 3, Permission = 5 },
-                        new { GroupId = 3, Permission = 6 },
-                        new { GroupId = 3, Permission = 7 }
+                        new { GroupId = 1, PermissionId = 1 },
+                        new { GroupId = 1, PermissionId = 3 },
+                        new { GroupId = 1, PermissionId = 4 },
+                        new { GroupId = 2, PermissionId = 1 },
+                        new { GroupId = 2, PermissionId = 2 },
+                        new { GroupId = 2, PermissionId = 3 },
+                        new { GroupId = 3, PermissionId = 1 },
+                        new { GroupId = 3, PermissionId = 2 },
+                        new { GroupId = 3, PermissionId = 3 },
+                        new { GroupId = 3, PermissionId = 5 },
+                        new { GroupId = 3, PermissionId = 6 },
+                        new { GroupId = 3, PermissionId = 7 }
                     );
                 });
 
@@ -172,6 +174,34 @@ namespace Repository.Migrations
                     b.ToTable("IssuesComment");
                 });
 
+            modelBuilder.Entity("Domain.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<DateTime>("UpdatedAt");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+
+                    b.HasData(
+                        new { Id = 1, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "IssueCreate", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 2, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "IssueAccept", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 3, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "IssueClose", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 4, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "IssueRateAssistence", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 5, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "ManageAccounts", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 6, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "ManageGroups", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) },
+                        new { Id = 7, CreatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified), Name = "ManageCategories", UpdatedAt = new DateTime(2019, 11, 24, 14, 34, 0, 0, DateTimeKind.Unspecified) }
+                    );
+                });
+
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Property<int>("Id")
@@ -207,6 +237,11 @@ namespace Repository.Migrations
                     b.HasOne("Domain.Group", "Group")
                         .WithMany("GroupPermissions")
                         .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Permission", "Permission")
+                        .WithMany("GroupPermissions")
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

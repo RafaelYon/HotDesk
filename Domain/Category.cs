@@ -9,7 +9,7 @@ namespace Domain
         [Required(AllowEmptyStrings = false, ErrorMessage = "Campo obrigatório")]
         public string Name { get; set; }
 
-        public List<Issue> Issues { get; set; }
+        public virtual List<Issue> Issues { get; set; }
 
         public Category()
         {

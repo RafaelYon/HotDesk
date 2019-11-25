@@ -9,16 +9,19 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using Repository;
 
 namespace Web.Controllers
 {
     public class UserController : Controller
     {
         private readonly UserDAO _userDAO;
+		private readonly UserRepository _userRepository;
 
-        public UserController(UserDAO userDAO)
+        public UserController(UserDAO userDAO, UserRepository userRepository)
         {
             _userDAO = userDAO;
+			_userRepository = userRepository;
         }
 
         // GET: Users/Details/5
@@ -69,7 +72,7 @@ namespace Web.Controllers
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             user.ConfirmPassword = string.Empty;
 
-            await _userDAO.Save(user);
+			await _userRepository.New(user);
 			await AuthenticateUser(user);
 
             return RedirectToAction("Index", "Home");
@@ -110,7 +113,7 @@ namespace Web.Controllers
 				new Claim(ClaimTypes.Email, user.Email)
 			};
 
-			foreach (Permission permission in user.GetPermissions())
+			foreach (PermissionType permission in user.GetPermissions())
 			{
 				claims.Add(new Claim(permission.ToString(), permission.ToString()));
 			}

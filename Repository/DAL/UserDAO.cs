@@ -1,6 +1,7 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Repository.DAL
@@ -14,9 +15,17 @@ namespace Repository.DAL
             return _context.Users;
         }
 
-        public async Task<User> FindByEmail(string email)
+		protected override DbSet<User> GetDbSetWithIncludes()
+		{
+			return (DbSet<User>) GetDbSet().Include(x => x.GroupUser)
+				.ThenInclude(gu => gu.Group)
+				.ThenInclude(g => g.GroupPermissions)
+				.ThenInclude(gp => gp.Permission);
+		}
+
+		public async Task<User> FindByEmail(string email)
         {
-            return await GetDbSet().FirstAsync(x => x.Email.Equals(email));
+			return await GetDbSet().FirstAsync(x => x.Email.Equals(email));
         }
 
         public async Task<bool> HasUserWithEmail(string email)

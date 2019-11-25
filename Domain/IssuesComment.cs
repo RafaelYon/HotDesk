@@ -10,10 +10,10 @@ namespace Domain
 
         [Display(Name = "Chamado")]
         [Required(ErrorMessage = "Não é possível criar um comentário sem especificar o chamado desejado")]
-        public Issue Issue { get; set; }
+        public virtual Issue Issue { get; set; }
 
         [Display(Name = "Autor")]
         [Required]
-        public User CreatedBy { get; set; }
+        public virtual User CreatedBy { get; set; }
     }
 }

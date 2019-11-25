@@ -32,7 +32,7 @@ namespace Domain
 
         public string Image { get; set; }
 
-        public List<GroupUser> GroupUser { get; set; }
+        public virtual List<GroupUser> GroupUser { get; set; }
 
         public virtual List<Issue> IssuesCreated { get; set; }
 
@@ -45,21 +45,21 @@ namespace Domain
             GroupUser = new List<GroupUser>();
         }
 
-        public List<Permission> GetPermissions()
+        public List<PermissionType> GetPermissions()
         {
-            var result = new List<Permission>();
+            var result = new List<PermissionType>();
 
-            foreach (var groupPermissions in GroupUser.Select(x => x.Group.GroupPermissions).ToArray())
+            foreach (List<GroupPermission> groupsPermissions in GroupUser.Select(x => x.Group.GroupPermissions).ToArray())
             {
-                foreach (GroupPermission groupPermission in groupPermissions)
-                {
-                    if (result.Contains(groupPermission.Permission))
-                    {
-                        continue;
-                    }
+				foreach (GroupPermission groupPermission in groupsPermissions)
+				{
+					if (result.Contains(groupPermission.Permission.PermissionType))
+					{
+						continue;
+					}
 
-                    result.Add(groupPermission.Permission);
-                }
+					result.Add(groupPermission.Permission.PermissionType);
+				}
             }
 
             return result;
