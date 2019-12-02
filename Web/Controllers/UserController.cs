@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using Repository;
+using Web.Services;
 
 namespace Web.Controllers
 {
@@ -71,6 +72,8 @@ namespace Web.Controllers
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             user.ConfirmPassword = string.Empty;
+
+            user.Image = await IdenticonService.RequestInBase64(user.Email);
 
 			await _userRepository.New(user);
 			await AuthenticateUser(user);

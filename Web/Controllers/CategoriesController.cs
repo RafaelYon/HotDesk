@@ -38,6 +38,12 @@ namespace Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (await CategoryExists(category.Name)) {
+                    ModelState.AddModelError("", $"Já foi cadastrado uma categoria com o nome \"{category.Name}\"");
+
+                    return View(category);
+                }
+                
 				await _categoryDAO.Save(category);
 
                 return RedirectToAction(nameof(Index));
@@ -136,6 +142,11 @@ namespace Web.Controllers
         private bool CategoryExists(int id)
         {
 			return _categoryDAO.FindOrDefault(id) != null;
+        }
+
+        private async Task<bool> CategoryExists(string name)
+        {
+            return await _categoryDAO.FindByName(name) != null;
         }
     }
 }
