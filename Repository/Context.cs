@@ -82,6 +82,9 @@ namespace Repository
 			modelBuilder.Entity<Permission>().HasData((new Permission()).GetSeedData().ToArray());
 			modelBuilder.Entity<Group>().HasData((new Group()).GetSeedData().ToArray());
 			modelBuilder.Entity<GroupPermission>().HasData((new GroupPermission()).GetSeedData().ToArray());
-		}
+
+            modelBuilder.Entity<User>().HasData((new User()).GetSeedData().ToArray());
+            modelBuilder.Entity<GroupUser>().HasData((new GroupUser()).GetSeedData().ToArray());
+        }
 	}
 }

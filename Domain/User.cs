@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Domain
 {
-    public class User : Model
+    public class User : Model, ISeed<User>
     {
         [Display(Name = "Nome")]
         [Required(ErrorMessage = "Campo obrigatório")]
@@ -61,6 +62,24 @@ namespace Domain
 					result.Add(groupPermission.Permission.PermissionType);
 				}
             }
+
+            return result;
+        }
+
+        public List<User> GetSeedData()
+        {
+            var result = new List<User>();
+
+            result.Add(new User
+            {
+                Id = 1,
+                Name = "Admin",
+                Image = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABBAQMAAAC0OVsGAAAABlBMVEX///84SyvAiwjYAAAAAnRSTlMA/1uRIrUAAAAiSURBVHicY2Bg/w8EHxiAYOSyBhz8h4KGgWP9ALmDf+BYACldHJem9JdHAAAAAElFTkSuQmCC",
+                Email = "admin@hotdesk.com",                
+                Password = "$2a$11$R0eCbYJa.keZBbcvJxtmu.pNFH7xS/q3e9izFAYae8dQAgb4ky2Z6", // "admin1234"
+                CreatedAt = new DateTime(2019, 12, 3, 14, 34, 00),
+                UpdatedAt = new DateTime(2019, 12, 3, 14, 24, 00),
+            });
 
             return result;
         }

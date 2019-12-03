@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain
 {
-    public class GroupUser
+    public class GroupUser : ISeed<GroupUser>
     {
         public int GroupId { get; set; }
 
@@ -20,6 +21,19 @@ namespace Domain
         public override bool Equals(object obj)
         {
             return GetHashCode() == obj?.GetHashCode();
+        }
+
+        public List<GroupUser> GetSeedData()
+        {
+            var result = new List<GroupUser>();
+
+            result.Add(new GroupUser
+            {
+                UserId = 1,
+                GroupId = 3
+            });
+
+            return result;
         }
     }
 }
