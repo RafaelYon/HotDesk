@@ -86,6 +86,13 @@ namespace Web.Controllers
             {
                 try
                 {
+                    if (await CheckIfNameIsUsedByAnother(category))
+                    {
+                        ModelState.AddModelError("", $"O nome {category.Name} já está em uso");
+
+                        return View(category);
+                    }
+
 					await _categoryDAO.Save(category);
                 }
                 catch (DbUpdateConcurrencyException)
@@ -99,8 +106,10 @@ namespace Web.Controllers
                         throw;
                     }
                 }
+                
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
@@ -147,6 +156,11 @@ namespace Web.Controllers
         private async Task<bool> CategoryExists(string name)
         {
             return await _categoryDAO.FindByName(name) != null;
+        }
+
+        private async Task<bool> CheckIfNameIsUsedByAnother(Category category)
+        {
+            return await _categoryDAO.FindAnotherByName(category, category.Name) != null;
         }
     }
 }

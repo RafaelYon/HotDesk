@@ -17,5 +17,10 @@ namespace Repository.DAL
 		{
 			return await GetDbSet().FirstOrDefaultAsync(x => x.Name.Equals(name));
 		}
+
+		public async Task<Category> FindAnotherByName(Category categoryToIgnore, string name)
+		{
+			return await GetDbSet().FirstOrDefaultAsync(x => x.Id != categoryToIgnore.Id && x.Name.Equals(name));
+		}
 	}
 }

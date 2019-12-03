@@ -8,7 +8,7 @@ namespace Web.Services
     {
         private static IRestClient GetWebClient()
         {
-            return new RestClient("https://identicon-1132].appspot.com");
+            return new RestClient("https://identicon-1132.appspot.com");
         }
         
         public static async Task<string> RequestInBase64(string hash)
