@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Domain
 {
@@ -21,6 +22,11 @@ namespace Domain
         {
 			GroupPermissions = new List<GroupPermission>();
             GroupUser = new List<GroupUser>();
+        }
+
+        public List<Permission> GetPermissions()
+        {
+            return GroupPermissions.Select(x => x.Permission).ToList();
         }
 
 		public List<Group> GetSeedData()

@@ -50,7 +50,12 @@ namespace Domain
 			GroupPermissions = new List<GroupPermission>();
 		}
 
-		public List<Permission> GetSeedData()
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, GetType());
+        }
+
+        public List<Permission> GetSeedData()
 		{
 			var permissions = new List<Permission>();
 

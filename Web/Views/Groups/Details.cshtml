@@ -23,6 +23,17 @@
             @Html.DisplayFor(model => model.Default)
         </dd>
         <dt>
+            Permissões
+        </dt>
+        <dd>
+            <ul>
+            @foreach (Permission p in Model.GetPermissions())
+            {
+                <li>@p.Name</li>
+            }
+            </ul>
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.CreatedAt)
         </dt>
         <dd>
@@ -37,6 +48,5 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a>
 </div>

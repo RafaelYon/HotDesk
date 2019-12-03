@@ -8,23 +8,26 @@ using Microsoft.EntityFrameworkCore;
 using Domain;
 using Repository;
 using Microsoft.AspNetCore.Authorization;
+using Repository.DAL;
 
 namespace Web.Controllers
 {
     [Authorize(Policy = "ManageGroups")]
     public class GroupsController : Controller
     {
+        private readonly GroupDAO _groupDAO;
         private readonly Context _context;
 
-        public GroupsController(Context context)
+        public GroupsController(GroupDAO groupDAO, Context context)
         {
+            _groupDAO = groupDAO;
             _context = context;
         }
 
         // GET: Groups
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Groups.ToListAsync());
+            return View(await _groupDAO.GetAll());
         }
 
         // GET: Groups/Details/5
@@ -35,8 +38,8 @@ namespace Web.Controllers
                 return NotFound();
             }
 
-            var @group = await _context.Groups
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var @group = await _groupDAO.FindOrDefault(id);
+
             if (@group == null)
             {
                 return NotFound();
@@ -46,8 +49,10 @@ namespace Web.Controllers
         }
 
         // GET: Groups/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PutPermissionsInView();
+
             return View();
         }
 
@@ -56,14 +61,24 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Default,Id,CreatedAt,UpdatedAt")] Group @group)
+        public async Task<IActionResult> Create([Bind("Name,Default")] Group @group, int[] permissions)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(@group);
-                await _context.SaveChangesAsync();
+                if (await GroupExists(@group.Name))
+                {
+                    ModelState.AddModelError("", $"O nome {group.Name} já está em uso");
+
+                    await PutPermissionsInView();
+                    return View(@group);
+                }
+
+                await SaveGroup(@group, permissions);
+
                 return RedirectToAction(nameof(Index));
             }
+
+            await PutPermissionsInView();
             return View(@group);
         }
 
@@ -75,11 +90,14 @@ namespace Web.Controllers
                 return NotFound();
             }
 
-            var @group = await _context.Groups.FindAsync(id);
+            var @group = await _groupDAO.FindOrDefault(id);
             if (@group == null)
             {
                 return NotFound();
             }
+
+            await PutPermissionsInView(@group);
+
             return View(@group);
         }
 
@@ -88,7 +106,7 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Default,Id,CreatedAt,UpdatedAt")] Group @group)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Default,Id")] Group @group, int[] permissions)
         {
             if (id != @group.Id)
             {
@@ -99,8 +117,14 @@ namespace Web.Controllers
             {
                 try
                 {
-                    _context.Update(@group);
-                    await _context.SaveChangesAsync();
+                    if (await CheckIfNameIsUsedByAnother(@group))
+                    {
+                        ModelState.AddModelError("", $"O nome {@group.Name} já está em uso");
+                        await PutPermissionsInView(@group);
+                        return View(@group);
+                    }
+
+                    await SaveGroup(@group, permissions);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -113,8 +137,11 @@ namespace Web.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
+            await PutPermissionsInView(@group);
             return View(@group);
         }
 
@@ -126,8 +153,7 @@ namespace Web.Controllers
                 return NotFound();
             }
 
-            var @group = await _context.Groups
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var @group = await _groupDAO.FindOrDefault(id);
             if (@group == null)
             {
                 return NotFound();
@@ -141,15 +167,50 @@ namespace Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var @group = await _context.Groups.FindAsync(id);
-            _context.Groups.Remove(@group);
-            await _context.SaveChangesAsync();
+            var @group = await _groupDAO.Find(id);
+            await _groupDAO.Delete(@group);
             return RedirectToAction(nameof(Index));
         }
 
         private bool GroupExists(int id)
         {
-            return _context.Groups.Any(e => e.Id == id);
+            return _groupDAO.FindOrDefault(id) != null;
+        }
+
+        private async Task<bool> GroupExists(string name)
+        {
+            return await _groupDAO.FindByName(name) != null;
+        }
+
+        private async Task<bool> CheckIfNameIsUsedByAnother(Group group)
+        {
+            return await _groupDAO.FindAnotherByName(group, group.Name) != null;
+        }
+
+        private async Task PutPermissionsInView(Group g = null)
+        {
+            ViewBag.Permissions = new MultiSelectList(
+                await _context.Permissions.ToListAsync(),
+                "Id", "Name", g?.GetPermissions().Select(x => x.Id).ToArray());
+        }
+
+        private async Task SaveGroup(Group @group, int[] permissions)
+        {
+            if (@group.Id == 0)
+            {
+                await _groupDAO.Save(@group);
+            }
+
+            foreach (var permissionId in permissions)
+            {
+                @group.GroupPermissions.Add(new GroupPermission
+                {
+                    GroupId = @group.Id,
+                    PermissionId = permissionId
+                });
+            }
+
+            await _groupDAO.Save(@group);
         }
     }
 }
