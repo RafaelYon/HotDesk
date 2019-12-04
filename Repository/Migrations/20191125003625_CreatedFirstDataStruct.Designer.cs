@@ -9,7 +9,7 @@ using Repository;
 
 namespace Repository.Migrations
 {
-    [DbContext(typeof(IssueeDAO))]
+    [DbContext(typeof(Context))]
     [Migration("20191125003625_CreatedFirstDataStruct")]
     partial class CreatedFirstDataStruct
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Repository;
+using Web.Helpers;
 using Web.Models;
 
 namespace Web.Controllers
@@ -8,7 +9,7 @@ namespace Web.Controllers
     {
 		private Context _context;
 
-		public HomeController(Context context)
+		public HomeController(Context context, AuthUser authUser) : base(authUser)
 		{
 			_context = context;
 		}
