@@ -15,6 +15,8 @@ namespace Repository
 
 		public DbSet<User> Users { get; set; }
 
+        public DbSet<GroupUser> GroupUser { get; set; }
+
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Issue> Issues { get; set; }

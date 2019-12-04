@@ -15,14 +15,6 @@ namespace Repository.DAL
             return _context.Users;
         }
 
-		protected override DbSet<User> GetDbSetWithIncludes()
-		{
-			return (DbSet<User>) GetDbSet().Include(x => x.GroupUser)
-				.ThenInclude(gu => gu.Group)
-				.ThenInclude(g => g.GroupPermissions)
-				.ThenInclude(gp => gp.Permission);
-		}
-
 		public async Task<User> FindByEmail(string email)
         {
 			return await GetDbSet().FirstAsync(x => x.Email.Equals(email));

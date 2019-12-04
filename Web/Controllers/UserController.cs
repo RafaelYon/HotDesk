@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using Repository;
 using Web.Services;
 using Web.Helpers;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 
 namespace Web.Controllers
 {
@@ -19,11 +21,13 @@ namespace Web.Controllers
     {
         private readonly UserDAO _userDAO;
 		private readonly UserRepository _userRepository;
+        private readonly GroupDAO _groupDAO;
 
-        public UserController(UserDAO userDAO, UserRepository userRepository)
+        public UserController(UserDAO userDAO, UserRepository userRepository, GroupDAO groupDAO)
         {
             _userDAO = userDAO;
 			_userRepository = userRepository;
+            _groupDAO = groupDAO;
         }
 
         // GET: Users/Details/5
@@ -145,8 +149,14 @@ namespace Web.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+        [Authorize(Policy = "ManageAccounts")]
+        public async Task<IActionResult> All()
+        {
+            return View(await _userDAO.GetAll());
+        }
+
         // GET: Users/Edit/5
-		[Authorize]
+        [Authorize(Policy = "ManageAccounts")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -154,11 +164,13 @@ namespace Web.Controllers
                 return NotFound();
             }
 
-            var user = await _userDAO.Find(id);
+            var user = await _userDAO.FindOrDefault(id);
             if (user == null)
             {
                 return NotFound();
             }
+
+            await PutGroupsInView(user);
 
             return View(user);
         }
@@ -168,8 +180,8 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-		[Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Email,Password,ConfirmPassword,Id")] User user)
+		[Authorize(Policy = "ManageAccounts")]
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Email,Password,Id")] User user, int[] groups)
         {
             if (id != user.Id)
             {
@@ -180,7 +192,7 @@ namespace Web.Controllers
             {
                 try
                 {
-                    await _userDAO.Save(user);
+                    await _userRepository.Update(user, groups);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -193,10 +205,91 @@ namespace Web.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
+                return RedirectToAction("Index", "Home");
+            }
+
+            await PutGroupsInView(user);
+            return View(user);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Settings()
+        {
+            var identity = (ClaimsIdentity)User.Identity;
+            string id = identity.FindFirst("Id").Value ?? "0";
+
+            if (id.Equals("0"))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _userDAO.FindOrDefault(Convert.ToInt32(id));
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Login));
             }
 
             return View(user);
+        }
+
+        // POST: Users/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Settings([Bind("Name,Email,Password,ConfirmPassword,Id")] User user)
+        {
+            var originalUser = await _userDAO.FindOrDefault(user.Id);
+
+            if (originalUser == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!string.IsNullOrEmpty(user.Name))
+            {
+                originalUser.Name = user.Name;
+            }
+
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                originalUser.Email = user.Email;
+            }
+
+            if (!string.IsNullOrEmpty(user.Password))
+            {
+                originalUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _userDAO.Save(originalUser);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (_userDAO.FindOrDefault(user.Id) == null)
+                    {
+                        return RedirectToAction(nameof(Login));
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(user);
+        }
+
+        private async Task PutGroupsInView(User u = null)
+        {
+            ViewBag.Groups = new MultiSelectList(
+                await _groupDAO.GetAll(),
+                "Id", "Name", u?.GetGroups().Select(x => x.Id).ToArray());
         }
     }
 }

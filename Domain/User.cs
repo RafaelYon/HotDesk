@@ -43,6 +43,11 @@ namespace Domain
 
         public User()
         {
+            ResetGroups();
+        }
+
+        public void ResetGroups()
+        {
             GroupUser = new List<GroupUser>();
         }
 
@@ -64,6 +69,11 @@ namespace Domain
             }
 
             return result;
+        }
+
+        public List<Group> GetGroups()
+        {
+            return GroupUser.Select(x => x.Group).ToList();
         }
 
         public List<User> GetSeedData()

@@ -46,7 +46,7 @@ namespace Repository.DAL
 
         public async Task<T> Find(params object[] keysValues)
         {
-			return await GetDbSetWithIncludes().FindAsync(keysValues);
+			return await GetDbSet().FindAsync(keysValues);
         }
 
 		public async Task<T> FindOrDefault(params object[] keyValues)
@@ -59,11 +59,6 @@ namespace Repository.DAL
 			{
 				return null;
 			}
-		}
-
-		protected virtual DbSet<T> GetDbSetWithIncludes()
-		{
-			return GetDbSet();
 		}
     }
 }
