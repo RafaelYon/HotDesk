@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Domain
 {
@@ -41,6 +42,11 @@ namespace Domain
         public Issue()
         {
             Comments = new List<IssuesComment>();
+        }
+
+        public List<IssuesComment> GetCommentsOrdened()
+        {
+            return Comments.OrderBy(x => x.Id).ToList();
         }
     }
 }

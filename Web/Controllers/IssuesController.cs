@@ -30,9 +30,18 @@ namespace Web.Controllers
         {
             try
             {
-                var user = await _authUser.GetUser(this);
+                List<Issue> issues = null;
 
-                return View(user.IssuesCreated);
+                if (_authUser.HasPermission(this, PermissionType.IssueClose))
+                {
+                    issues = await _issueDAO.GetAllOrderned();
+                }
+                else
+                {
+                    issues = await _issueDAO.GetIssuesOfRelatedUser(await _authUser.GetUser(this));
+                }
+
+                return View(issues);
             }
             catch (Exception)
             {
@@ -55,10 +64,37 @@ namespace Web.Controllers
                 if (_authUser.HasPermission(this, PermissionType.IssueClose))
                 {
                     issue = await _issueDAO.FindOrDefault(id);
+
+                    ViewBag.CanClose = true;
                 }
                 else
                 {
-                    issue = await _issueDAO.GetIssueOfRelatedUser(await _authUser.GetUser(this), id ?? 0);
+                    var user = await _authUser.GetUser(this);
+                    
+                    issue = await _issueDAO.GetIssueOfRelatedUser(user, id ?? 0);
+
+                    if (issue?.Status != IssueStatus.Closed)
+                    {
+                        ViewBag.CanComment = true;
+
+                        if (issue?.Owner.Id != user.Id && issue?.Responsible == null)
+                        {
+                            ViewBag.CanAssign = true;
+                        }
+                    }
+                    else 
+                    {
+                        ViewBag.CanComment = false;
+                    }
+
+                    if (issue?.Responsible.Id == user.Id && issue?.Status != IssueStatus.Closed)
+                    {
+                        ViewBag.CanClose = true;
+                    }
+                    else if (issue?.Owner.Id == user.Id && issue?.Status == IssueStatus.Closed)
+                    {
+                        ViewBag.CanRate = true;
+                    }
                 }
 
                 if (issue == null)
@@ -76,9 +112,9 @@ namespace Web.Controllers
 
         // GET: Issues/Create
         [Authorize(Policy = "IssueCreate")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = _categoryDAO.GetAll();
+            await PutCategoriesInView();
 
             return View();
         }
@@ -104,9 +140,10 @@ namespace Web.Controllers
 
                     await _issueDAO.Save(issue);
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Details), issue.Id);
                 }
 
+                await PutCategoriesInView();
                 return View(issue);
             }
             catch (Exception)
@@ -223,6 +260,14 @@ namespace Web.Controllers
 
             AddAlert(Models.AlertType.Warning, "Comentário adicionado com sucesso");
             return RedirectToAction(nameof(Details), id);
+        }
+
+        private async Task PutCategoriesInView()
+        {
+            ViewBag.Categories = new SelectList(
+                await _categoryDAO.GetAll(),
+                "Id", "Name"
+            );
         }
 
         private async Task<bool> IssueExists(int id)

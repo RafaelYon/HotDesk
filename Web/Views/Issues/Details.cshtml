@@ -1,54 +1,103 @@
 ﻿@model Domain.Issue
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chamado #" + Model.Id;
 }
 
-<h2>Details</h2>
-
-<div>
-    <h4>Issue</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Rate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Rate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-    </dl>
+<div class="row">
+    <div class="col">
+        <h2>Chamado #@Model.Id
+        </h2>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>
+                    @Model.Title
+                </h4>
+            </div>
+            <div class="col-md-4">
+                <span class="text-muted">
+                    @Model.CreatedAt
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p>
+                    @Html.DisplayFor(model => model.Description)
+                </p>
+            </div>
+        </div>
+        @foreach (IssueComment comment in Model.GetCommentsOrdened())
+        {
+            <div class="row">
+                <div class="col-md-2">
+                    <img class="img-fluid rounded" alt="@comment.CreatedBy.Name" src="data:image/png;base64, @comment.CreatedBy.Image">
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-2 offset-md-10">
+                            <span class="text-muted">
+                                @comment.CreatedAt
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p>
+                            @comment.Comment
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="row">
+            <div class="col-md-10 offset-md-2">
+                <form asp-action="Comment">
+                    <div class="form-group">
+                        <label for="comment">Comentário</label>
+                        <textarea class="form-control" name="comment" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+        @if (ViewBag.CanAssign)
+        {
+            <div class="col">
+                <form asp-action="Assign">
+                    <input type="hidden" value="@Model.Id" name="id" />
+                    <button class="btn btn-primary" type="submit">Assumir</button>
+                </form>
+            </div>
+        }
+        @if (ViewBag.CanClose)
+        {
+            <div class="col">
+                <form asp-action="Close">
+                    <input type="hidden" value="@Model.Id" name="id" />
+                    <button class="btn btn-secondary" type="submit">Encerrar</button>
+                </form>
+            </div>
+        }
+        @if (ViewBag.CanRate)
+        {
+            <div class="col">
+                <form asp-action="Rate">
+                    <input type="hidden" value="@Model.Id" name="id" />
+                    <input type="number" step=".01" name="rate" class="form-control" required/>
+                    <button class="btn btn-info" type="submit">Avaliar</button>
+                </form>
+            </div>
+        }
+        </div>
+    </div>
 </div>
