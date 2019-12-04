@@ -115,6 +115,116 @@ namespace Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "IssueAccept")]
+        public async Task<IActionResult> Assign(int id)
+        {
+            var issue = await _issueDAO.FindOrDefault(id);
+
+            if (issue == null)
+            {
+                return NotFound();
+            }
+
+            if (issue.Responsible == null || issue.Status == IssueStatus.Closed)
+            {
+                AddAlert(Models.AlertType.Warning, "O chamado não está disponível para efetuar esta ação");
+                return RedirectToAction(nameof(Details), id);
+            }
+
+            issue.Responsible = await _authUser.GetUser(this);
+            await _issueDAO.Save(issue);
+
+            AddAlert(Models.AlertType.Success, "Você foi associação como reponsável pelo chamado!");
+            return RedirectToAction(nameof(Details), id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Close(int id)
+        {
+            var issue = await _issueDAO.FindOrDefault(id);
+
+            if (issue == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _authUser.GetUser(this);
+
+            if (issue.Responsible.Id != user.Id && !_authUser.HasPermission(this, PermissionType.IssueClose))
+            {
+                AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
+                return RedirectToAction(nameof(Details), id);
+            }
+
+            issue.Status = IssueStatus.Closed;
+            await _issueDAO.Save(issue);
+
+            AddAlert(Models.AlertType.Warning, "O chamado foi finalizado");
+            return RedirectToAction(nameof(Details), id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "IssueRateAssistence")]
+        public async Task<IActionResult> Rate(int id, float rate)
+        {
+            var issue = await _issueDAO.FindOrDefault(id);
+
+            if (issue == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _authUser.GetUser(this);
+
+            if (issue.Status != IssueStatus.Closed || issue.Owner.Id != user.Id)
+            {
+                AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
+                return RedirectToAction(nameof(Details), id);
+            }
+
+            issue.Rate = rate;
+            await _issueDAO.Save(issue);
+
+            AddAlert(Models.AlertType.Warning, "O chamado foi avaliado");
+            return RedirectToAction(nameof(Details), id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Comment(int id, string comment)
+        {
+            var issue = await _issueDAO.FindOrDefault(id);
+
+            if (issue == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _authUser.GetUser(this);
+
+            if (issue.Owner.Id != user.Id && issue.Responsible?.Id != user.Id && !_authUser.HasPermission(this, PermissionType.IssueClose))
+            {
+                AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
+                return RedirectToAction(nameof(Details), id);
+            }
+
+            issue.Comments.Add(new IssuesComment
+            {
+                Comment = comment,
+                CreatedBy = user,
+                Issue = issue
+            });
+            
+            await _issueDAO.Save(issue);
+
+            AddAlert(Models.AlertType.Warning, "Comentário adicionado com sucesso");
+            return RedirectToAction(nameof(Details), id);
+        }
+
         private async Task<bool> IssueExists(int id)
         {
             return await _issueDAO.FindOrDefault(id) != null;
