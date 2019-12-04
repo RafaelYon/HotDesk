@@ -1,4 +1,6 @@
-﻿using Web.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Web.Helpers;
+using Web.Models;
 using MicrosoftMVC = Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
@@ -6,6 +8,13 @@ namespace Web.Controllers
 	public class Controller : MicrosoftMVC.Controller
 	{
 		private const string ALERT_KEY = "Alert";
+
+        protected readonly AuthUser _authUser;
+
+        public Controller(AuthUser authUser)
+        {
+            _authUser = authUser;
+        }
 
 		protected void AddAlert(Alert alert)
 		{
@@ -31,5 +40,10 @@ namespace Web.Controllers
 				Content = content
 			});
 		}
+
+        protected IActionResult RedirectToLogin()
+        {
+            return RedirectToAction("Login", "User");
+        }
 	}
 }

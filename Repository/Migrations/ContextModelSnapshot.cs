@@ -8,7 +8,7 @@ using Repository;
 
 namespace Repository.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(IssueeDAO))]
     partial class ContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

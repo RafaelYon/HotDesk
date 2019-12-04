@@ -23,7 +23,8 @@ namespace Web.Controllers
 		private readonly UserRepository _userRepository;
         private readonly GroupDAO _groupDAO;
 
-        public UserController(UserDAO userDAO, UserRepository userRepository, GroupDAO groupDAO)
+        public UserController(UserDAO userDAO, UserRepository userRepository, GroupDAO groupDAO, AuthUser authUser)
+            : base(authUser)
         {
             _userDAO = userDAO;
 			_userRepository = userRepository;

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
 using Repository.DAL;
+using Web.Helpers;
 
 namespace Web
 {
@@ -40,9 +41,11 @@ namespace Web
 					.UseSqlServer(Configuration.GetConnectionString("RW"))
 					.UseLazyLoadingProxies());
 
+            services.AddScoped<AuthUser>();
             services.AddScoped<UserDAO>();
 			services.AddScoped<CategoryDAO>();
 			services.AddScoped<GroupDAO>();
+            services.AddScoped<IssueDAO>();
 
 			services.AddScoped<UserRepository>();
 

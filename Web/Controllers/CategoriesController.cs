@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain;
 using Repository.DAL;
 using Microsoft.AspNetCore.Authorization;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -12,7 +13,7 @@ namespace Web.Controllers
     {
 		private readonly CategoryDAO _categoryDAO;
 
-        public CategoriesController(CategoryDAO categoryDAO)
+        public CategoriesController(CategoryDAO categoryDAO, AuthUser authUser) : base(authUser)
         {
 			_categoryDAO = categoryDAO;
         }

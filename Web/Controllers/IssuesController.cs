@@ -7,45 +7,79 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Repository;
+using Microsoft.AspNetCore.Authorization;
+using Web.Helpers;
+using Repository.DAL;
 
 namespace Web.Controllers
 {
+    [Authorize]
     public class IssuesController : Controller
     {
-        private readonly Context _context;
+        private readonly IssueDAO _issueDAO;
+        private readonly CategoryDAO _categoryDAO;
 
-        public IssuesController(Context context)
+        public IssuesController(IssueDAO issueDAO, CategoryDAO categoryDAO, AuthUser authUser) : base(authUser)
         {
-            _context = context;
+            _issueDAO = issueDAO;
+            _categoryDAO = categoryDAO;
         }
 
         // GET: Issues
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Issues.ToListAsync());
+            try
+            {
+                var user = await _authUser.GetUser(this);
+
+                return View(user.IssuesCreated);
+            }
+            catch (Exception)
+            {
+                return RedirectToLogin();
+            }
         }
 
         // GET: Issues/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var issue = await _context.Issues
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (issue == null)
+                Issue issue = null;
+
+                if (_authUser.HasPermission(this, PermissionType.IssueClose))
+                {
+                    issue = await _issueDAO.FindOrDefault(id);
+                }
+                else
+                {
+                    issue = await _issueDAO.GetIssueOfRelatedUser(await _authUser.GetUser(this), id ?? 0);
+                }
+
+                if (issue == null)
+                {
+                    return NotFound();
+                }
+
+                return View(issue);
+            }
+            catch (Exception)
             {
-                return NotFound();
+                return RedirectToLogin();
             }
-
-            return View(issue);
         }
 
         // GET: Issues/Create
+        [Authorize(Policy = "IssueCreate")]
         public IActionResult Create()
         {
+            ViewBag.Categories = _categoryDAO.GetAll();
+
             return View();
         }
 
@@ -54,100 +88,36 @@ namespace Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Description,Rate,Status,Id,CreatedAt,UpdatedAt")] Issue issue)
+        public async Task<IActionResult> Create([Bind("Title,Description")] Issue issue, int categoryId)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(issue);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(issue);
-        }
-
-        // GET: Issues/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var issue = await _context.Issues.FindAsync(id);
-            if (issue == null)
-            {
-                return NotFound();
-            }
-            return View(issue);
-        }
-
-        // POST: Issues/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,Description,Rate,Status,Id,CreatedAt,UpdatedAt")] Issue issue)
-        {
-            if (id != issue.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(issue);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!IssueExists(issue.Id))
+                    issue.Category = await _categoryDAO.FindOrDefault(categoryId);
+                    issue.Owner = await _authUser.GetUser(this);
+
+                    if (issue.Category == null)
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    await _issueDAO.Save(issue);
+
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(issue);
-        }
 
-        // GET: Issues/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+                return View(issue);
+            }
+            catch (Exception)
             {
-                return NotFound();
+                return RedirectToLogin();
             }
-
-            var issue = await _context.Issues
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (issue == null)
-            {
-                return NotFound();
-            }
-
-            return View(issue);
         }
 
-        // POST: Issues/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        private async Task<bool> IssueExists(int id)
         {
-            var issue = await _context.Issues.FindAsync(id);
-            _context.Issues.Remove(issue);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool IssueExists(int id)
-        {
-            return _context.Issues.Any(e => e.Id == id);
+            return await _issueDAO.FindOrDefault(id) != null;
         }
     }
 }

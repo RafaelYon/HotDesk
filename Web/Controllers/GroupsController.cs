@@ -9,6 +9,7 @@ using Domain;
 using Repository;
 using Microsoft.AspNetCore.Authorization;
 using Repository.DAL;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -18,7 +19,7 @@ namespace Web.Controllers
         private readonly GroupDAO _groupDAO;
         private readonly Context _context;
 
-        public GroupsController(GroupDAO groupDAO, Context context)
+        public GroupsController(GroupDAO groupDAO, Context context, AuthUser authUser) : base(authUser)
         {
             _groupDAO = groupDAO;
             _context = context;
