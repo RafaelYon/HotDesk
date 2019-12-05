@@ -100,6 +100,14 @@ namespace Web.Controllers
 		{
 			var dbUser = await _userDAO.FindByEmail(user.Email);
 
+            if (dbUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "Credenciais inválidas");
+				user.Password = string.Empty;
+
+				return View(user);
+            }
+
 			if (!BCrypt.Net.BCrypt.Verify(user.Password, dbUser.Password))
 			{
 				ModelState.AddModelError(string.Empty, "Credenciais inválidas");

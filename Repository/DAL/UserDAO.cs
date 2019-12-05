@@ -17,16 +17,16 @@ namespace Repository.DAL
 
 		public async Task<User> FindByEmail(string email)
         {
-			return await GetDbSet().FirstAsync(x => x.Email.Equals(email));
+			return await GetDbSet().FirstOrDefaultAsync(x => x.Email.Equals(email));
         }
 
         public async Task<bool> HasUserWithEmail(string email)
         {
             try
             {
-                await FindByEmail(email);
+                var user = await FindByEmail(email);
 
-                return true;
+                return user != null;
             }
             catch (Exception)
             {
