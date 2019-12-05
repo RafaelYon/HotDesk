@@ -38,7 +38,7 @@ namespace Web
 
 			services.AddDbContext<Context>
 				(options => options
-					.UseSqlServer(Configuration.GetConnectionString("RW"))
+					.UseSqlServer(Configuration.GetConnectionString("Docker"))
 					.UseLazyLoadingProxies());
 
             services.AddScoped<AuthUser>();

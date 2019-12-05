@@ -1,0 +1,10 @@
+version: "3.1"
+services:
+
+    db:
+      image: "mcr.microsoft.com/mssql/server:2017-latest-ubuntu"
+      ports:
+        - "1433:1433"
+      environment:
+          SA_PASSWORD: "S3cretP@ass"
+          ACCEPT_EULA: "Y"
