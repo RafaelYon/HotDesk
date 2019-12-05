@@ -222,7 +222,7 @@ namespace Web.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(All));
             }
 
             await PutGroupsInView((User)userE);
@@ -246,7 +246,7 @@ namespace Web.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            return View(user);
+            return View((UserEditable)user);
         }
 
         // POST: Users/Edit/5
@@ -255,32 +255,26 @@ namespace Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Settings([Bind("Name,Email,Password,ConfirmPassword,Id")] User user)
+        public async Task<IActionResult> Settings([Bind("Name,Email,Password,Id")] UserEditable userE)
         {
-            var originalUser = await _userDAO.FindOrDefault(user.Id);
-
-            if (originalUser == null)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            if (!string.IsNullOrEmpty(user.Name))
-            {
-                originalUser.Name = user.Name;
-            }
-
-            if (!string.IsNullOrEmpty(user.Email))
-            {
-                originalUser.Email = user.Email;
-            }
-
-            if (!string.IsNullOrEmpty(user.Password))
-            {
-                originalUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            }
-
             if (ModelState.IsValid)
             {
+                User user = (User)userE;
+                var originalUser = await _userDAO.FindOrDefault(user.Id);
+
+                if (originalUser == null)
+                {
+                    return RedirectToAction(nameof(Login));
+                }
+
+                originalUser.Name = user.Name;
+                originalUser.Email = user.Email;
+
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    originalUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                }
+
                 try
                 {
                     await _userDAO.Save(originalUser);
@@ -296,10 +290,11 @@ namespace Web.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction("Index", "Home");
             }
 
-            return View(user);
+            return View(userE);
         }
 
         private async Task PutGroupsInView(User u = null)
