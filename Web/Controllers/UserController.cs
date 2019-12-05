@@ -173,7 +173,7 @@ namespace Web.Controllers
 
             await PutGroupsInView(user);
 
-            return View(user);
+            return View((UserEditable)user);
         }
 
         // POST: Users/Edit/5
@@ -182,9 +182,9 @@ namespace Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize(Policy = "ManageAccounts")]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Email,Password,Id")] User user, int[] groups)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Email,Password,Id")] UserEditable userE, int[] groups)
         {
-            if (id != user.Id)
+            if (id != userE.Id)
             {
                 return NotFound();
             }
@@ -193,11 +193,27 @@ namespace Web.Controllers
             {
                 try
                 {
-                    await _userRepository.Update(user, groups);
+                    User user = (User)userE;
+                    User original = await _userDAO.FindOrDefault(user.Id);
+
+                    if (original == null)
+                    {
+                        return NotFound();
+                    }
+
+                    original.Name = user.Name;
+                    original.Email = user.Email;
+
+                    if (!string.IsNullOrWhiteSpace(user.Password))
+                    {
+                        original.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                    }
+                    
+                    await _userRepository.Update(original, groups);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (_userDAO.Find(user.Id) == null)
+                    if (_userDAO.Find(userE.Id) == null)
                     {
                         return NotFound();
                     }
@@ -209,8 +225,8 @@ namespace Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            await PutGroupsInView(user);
-            return View(user);
+            await PutGroupsInView((User)userE);
+            return View(userE);
         }
 
         [Authorize]

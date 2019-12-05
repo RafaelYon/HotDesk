@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Domain
 {
-    public class User : Model, ISeed<User>
+    public class UserEditable : Model
     {
         [Display(Name = "Nome")]
         [Required(ErrorMessage = "Campo obrigatório")]
@@ -19,17 +19,9 @@ namespace Domain
         public string Email { get; set; }
 
         [Display(Name = "Senha")]
-        [Required(ErrorMessage = "Campo obrigatório")]
         [MinLength(6, ErrorMessage = "A senha deve possuir no mínimo 6 caracteres")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        [Display(Name = "Confirmação de senha")]
-        [Required(ErrorMessage = "Campo obrigatório")]
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "A senhas não concidem")]
-        [NotMapped]
-        public string ConfirmPassword { get; set; }
 
         public string Image { get; set; }
 
@@ -40,16 +32,6 @@ namespace Domain
         public virtual List<Issue> IssuesAssigned { get; set; }
 
         public virtual List<IssuesComment> IssuesComments { get; set; }
-
-        public User()
-        {
-            ResetGroups();
-        }
-
-        public void ResetGroups()
-        {
-            GroupUser = new List<GroupUser>();
-        }
 
         public List<PermissionType> GetPermissions()
         {
@@ -76,35 +58,18 @@ namespace Domain
             return GroupUser.Select(x => x.Group).ToList();
         }
 
-        public List<User> GetSeedData()
+        public static implicit operator User(UserEditable ue)
         {
-            var result = new List<User>();
-
-            result.Add(new User
+            return new User
             {
-                Id = 1,
-                Name = "Admin",
-                Image = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABBAQMAAAC0OVsGAAAABlBMVEX///84SyvAiwjYAAAAAnRSTlMA/1uRIrUAAAAiSURBVHicY2Bg/w8EHxiAYOSyBhz8h4KGgWP9ALmDf+BYACldHJem9JdHAAAAAElFTkSuQmCC",
-                Email = "admin@hotdesk.com",                
-                Password = "$2a$11$R0eCbYJa.keZBbcvJxtmu.pNFH7xS/q3e9izFAYae8dQAgb4ky2Z6", // "admin1234"
-                CreatedAt = new DateTime(2019, 12, 3, 14, 34, 00),
-                UpdatedAt = new DateTime(2019, 12, 3, 14, 24, 00),
-            });
-
-            return result;
-        }
-
-        public static implicit operator UserEditable(User u)
-        {
-            return new UserEditable
-            {
-                Id = u.Id,
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt,
-                Name = u.Name,
-                Email = u.Email,
-                Password = u.Password,
-                Image = u.Image
+                Id = ue.Id,
+                CreatedAt = ue.CreatedAt,
+                UpdatedAt = ue.UpdatedAt,
+                Name = ue.Name,
+                Email = ue.Email,
+                Password = ue.Password,
+                ConfirmPassword = ue.Password,
+                Image = ue.Image
             };
         }
     }
