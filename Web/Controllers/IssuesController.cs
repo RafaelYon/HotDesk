@@ -102,7 +102,7 @@ namespace Web.Controllers
                     ViewBag.CanAssign = false;
                     ViewBag.CanClose = false;
 
-                    if (issue?.Owner.Id == user.Id)
+                    if (issue?.Owner.Id == user.Id && issue?.Rate == null)
                     {
                         ViewBag.CanRate = true;
                     }
@@ -179,7 +179,7 @@ namespace Web.Controllers
                 return NotFound();
             }
 
-            if (issue.Responsible == null || issue.Status == IssueStatus.Closed)
+            if (issue.Responsible != null || issue.Status == IssueStatus.Closed)
             {
                 AddAlert(Models.AlertType.Warning, "O chamado não está disponível para efetuar esta ação");
                 return RedirectToDetaits(id);
@@ -232,7 +232,7 @@ namespace Web.Controllers
 
             var user = await _authUser.GetUser(this);
 
-            if (issue.Status != IssueStatus.Closed || issue.Owner.Id != user.Id)
+            if (issue.Status != IssueStatus.Closed || issue.Owner.Id != user.Id || issue.Rate != null || rate < 0 || rate > 5)
             {
                 AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
                 return RedirectToDetaits(id);

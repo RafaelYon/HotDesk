@@ -97,8 +97,12 @@
             <div class="col-md-12 p-2">
                 <form asp-action="Rate">
                     <input type="hidden" value="@Model.Id" name="id" />
-                    <input type="number" step=".01" name="rate" class="form-control" required/>
-                    <button class="btn btn-info" type="submit">Avaliar</button>
+                    <div class="form-group">
+                        <input type="number" step=".01" name="rate" class="form-control" min="0" max="5" required/>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-info" type="submit">Avaliar</button>
+                    </div>
                 </form>
             </div>
         }
