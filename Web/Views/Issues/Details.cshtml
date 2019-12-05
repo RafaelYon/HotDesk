@@ -6,50 +6,64 @@
 
 <div class="row">
     <div class="col">
-        <h2>Chamado #@Model.Id
+        <h2>
+            Chamado #@Model.Id
         </h2>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-10">
-        <div class="row">
-            <div class="col-md-8">
-                <h4>
-                    @Model.Title
-                </h4>
-            </div>
-            <div class="col-md-4">
-                <span class="text-muted">
-                    @Model.CreatedAt
-                </span>
-            </div>
-        </div>
-        <div class="row">
+        <div class="row m-2">
             <div class="col">
-                <p>
-                    @Html.DisplayFor(model => model.Description)
-                </p>
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            @Model.Title
+                        </h4>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    Criado por: <b>
+                                        @Model.Owner.Name
+                                    </b>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    @Model.CreatedAt
+                                </div>
+                            </div>
+                        </h6>
+                        <p class="card-text">
+                            @Html.DisplayFor(model => model.Description)
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
         @foreach (IssuesComment comment in Model.GetCommentsOrdened())
         {
-            <div class="row">
-                <div class="col-md-2">
-                    <img class="img-fluid rounded" alt="@comment.CreatedBy.Name" src="data:image/png;base64, @comment.CreatedBy.Image">
-                </div>
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-md-2 offset-md-10">
-                            <span class="text-muted">
-                                @comment.CreatedAt
-                            </span>
+            <div class="row m-2">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-8 text-right">
+                                        @comment.CreatedAt
+                                    </div>
+                                </div>
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-1 text-center">
+                                    <img class="img-fluid img-thumbnail rounded" alt="@comment.CreatedBy.Name" src="data:image/png;base64, @comment.CreatedBy.Image">
+                                </div>
+                                <div class="col-md-11">
+                                    <p class="card-text">
+                                        @comment.Comment
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <p>
-                            @comment.Comment
-                        </p>
                     </div>
                 </div>
             </div>
@@ -57,7 +71,7 @@
         @if (ViewBag.CanComment)
         {
             <div class="row">
-                <div class="col-md-10 offset-md-2">
+                <div class="col-md-10 offset-md-1">
                     <form asp-action="Comment">
                         <div class="form-group">
                             <label for="comment">Comentário</label>
@@ -74,34 +88,31 @@
     </div>
     <div class="col-md-2">
         <div class="row text-center">
-        @if (ViewBag.CanAssign)
-        {
             <div class="col-md-12 p-2">
-                <form asp-action="Assign">
+                <form method="post">
                     <input type="hidden" value="@Model.Id" name="id" />
-                    <button class="btn btn-primary" type="submit">Assumir</button>
+                    <div class="btn-group">
+                        @if (ViewBag.CanAssign)
+                        {
+                            <button class="btn btn-primary" type="submit" asp-action="Assign">Assumir</button>
+                        }
+                        @if (ViewBag.CanClose)
+                        {
+                            <button class="btn btn-secondary" type="submit" asp-action="Close">Encerrar</button>
+                        }
+                    </div>
                 </form>
             </div>
-        }
-        @if (ViewBag.CanClose)
-        {
-            <div class="col-md-12 p-2">
-                <form asp-action="Close">
-                    <input type="hidden" value="@Model.Id" name="id" />
-                    <button class="btn btn-secondary" type="submit">Encerrar</button>
-                </form>
-            </div>
-        }
         @if (ViewBag.CanRate)
         {
             <div class="col-md-12 p-2">
                 <form asp-action="Rate">
                     <input type="hidden" value="@Model.Id" name="id" />
-                    <div class="form-group">
+                    <div class="input-group">
                         <input type="number" step=".01" name="rate" class="form-control" min="0" max="5" required/>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-info" type="submit">Avaliar</button>
+                        <div class="input-group-append">
+                            <button class="btn btn-info" type="submit">Avaliar</button>
+                        </div>
                     </div>
                 </form>
             </div>
