@@ -50,6 +50,11 @@ namespace Web.Helpers
             return claim.Value;
         }
 
+        public bool IsAuthenticated(Controller controller)
+        {
+            return controller.User.Identity.IsAuthenticated;
+        }
+
         public async Task<User> GetUser(Controller controller)
         {
             string id = GetClaimValue(controller, "Id", "0");

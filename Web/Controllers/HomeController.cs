@@ -16,7 +16,12 @@ namespace Web.Controllers
 
 		public IActionResult Index()
         {
-			return View();
+			if (!_authUser.IsAuthenticated(this))
+			{
+				return RedirectToAction("Login", "User");
+			}
+
+			return RedirectToAction("Index", "Issues");
         }
 	}
 }
