@@ -31,9 +31,28 @@ namespace Web.Helpers
             return (ClaimsIdentity)controller.User.Identity;
         }
 
+        private String GetClaimValue(Controller controller, string name, string defaultValue = "")
+        {
+            var identity = GetClaimsIdentity(controller);
+
+            if (identity == null)
+            {
+                return defaultValue;
+            }
+
+            var claim = identity.FindFirst(name);
+
+            if (claim == null)
+            {
+                return defaultValue;
+            }
+
+            return claim.Value;
+        }
+
         public async Task<User> GetUser(Controller controller)
         {
-            string id = GetClaimsIdentity(controller).FindFirst("Id").Value ?? "0";
+            string id = GetClaimValue(controller, "Id", "0");
 
             if (id.Equals("0"))
             {
@@ -52,7 +71,7 @@ namespace Web.Helpers
 
         public bool HasPermission(Controller controller, PermissionType permission)
         {
-            string value = GetClaimsIdentity(controller).FindFirst(permission.ToString()).Value ?? "";
+            string value = GetClaimValue(controller, permission.ToString());
 
             return !value.Equals("");
         }

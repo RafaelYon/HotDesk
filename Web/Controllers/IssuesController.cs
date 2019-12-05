@@ -61,39 +61,54 @@ namespace Web.Controllers
 
                 Issue issue = null;
 
+                var user = await _authUser.GetUser(this);
+
                 if (_authUser.HasPermission(this, PermissionType.IssueClose))
                 {
                     issue = await _issueDAO.FindOrDefault(id);
-
-                    ViewBag.CanClose = true;
                 }
                 else
                 {
-                    var user = await _authUser.GetUser(this);
-                    
                     issue = await _issueDAO.GetIssueOfRelatedUser(user, id ?? 0);
+                }
 
-                    if (issue?.Status != IssueStatus.Closed)
+                if (issue?.Status != IssueStatus.Closed)
+                {
+                    ViewBag.CanComment = true;
+
+                    if (issue?.Owner.Id != user.Id && issue?.Responsible == null && _authUser.HasPermission(this, PermissionType.IssueAccept))
                     {
-                        ViewBag.CanComment = true;
-
-                        if (issue?.Owner.Id != user.Id && issue?.Responsible == null)
-                        {
-                            ViewBag.CanAssign = true;
-                        }
+                        ViewBag.CanAssign = true;
                     }
-                    else 
+                    else
                     {
-                        ViewBag.CanComment = false;
+                        ViewBag.CanAssign = false;
                     }
 
-                    if (issue?.Responsible.Id == user.Id && issue?.Status != IssueStatus.Closed)
+                    if (issue?.Responsible?.Id == user.Id || _authUser.HasPermission(this, PermissionType.IssueClose))
                     {
                         ViewBag.CanClose = true;
                     }
-                    else if (issue?.Owner.Id == user.Id && issue?.Status == IssueStatus.Closed)
+                    else
+                    {
+                        ViewBag.CanClose = false;
+                    }
+
+                    ViewBag.CanRate = false;
+                }
+                else 
+                {
+                    ViewBag.CanComment = false;
+                    ViewBag.CanAssign = false;
+                    ViewBag.CanClose = false;
+
+                    if (issue?.Owner.Id == user.Id)
                     {
                         ViewBag.CanRate = true;
+                    }
+                    else
+                    {
+                        ViewBag.CanRate = false;
                     }
                 }
 
@@ -104,7 +119,7 @@ namespace Web.Controllers
 
                 return View(issue);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return RedirectToLogin();
             }
@@ -140,7 +155,7 @@ namespace Web.Controllers
 
                     await _issueDAO.Save(issue);
 
-                    return RedirectToAction(nameof(Details), issue.Id);
+                    return RedirectToDetaits(issue.Id);
                 }
 
                 await PutCategoriesInView();
@@ -167,14 +182,14 @@ namespace Web.Controllers
             if (issue.Responsible == null || issue.Status == IssueStatus.Closed)
             {
                 AddAlert(Models.AlertType.Warning, "O chamado não está disponível para efetuar esta ação");
-                return RedirectToAction(nameof(Details), id);
+                return RedirectToDetaits(id);
             }
 
             issue.Responsible = await _authUser.GetUser(this);
             await _issueDAO.Save(issue);
 
             AddAlert(Models.AlertType.Success, "Você foi associação como reponsável pelo chamado!");
-            return RedirectToAction(nameof(Details), id);
+            return RedirectToDetaits(id);
         }
 
         [HttpPost]
@@ -190,17 +205,17 @@ namespace Web.Controllers
 
             var user = await _authUser.GetUser(this);
 
-            if (issue.Responsible.Id != user.Id && !_authUser.HasPermission(this, PermissionType.IssueClose))
+            if (issue?.Responsible?.Id != user.Id && !_authUser.HasPermission(this, PermissionType.IssueClose))
             {
                 AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
-                return RedirectToAction(nameof(Details), id);
+                return RedirectToDetaits(id);
             }
 
             issue.Status = IssueStatus.Closed;
             await _issueDAO.Save(issue);
 
             AddAlert(Models.AlertType.Warning, "O chamado foi finalizado");
-            return RedirectToAction(nameof(Details), id);
+            return RedirectToDetaits(id);
         }
 
         [HttpPost]
@@ -220,14 +235,14 @@ namespace Web.Controllers
             if (issue.Status != IssueStatus.Closed || issue.Owner.Id != user.Id)
             {
                 AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
-                return RedirectToAction(nameof(Details), id);
+                return RedirectToDetaits(id);
             }
 
             issue.Rate = rate;
             await _issueDAO.Save(issue);
 
             AddAlert(Models.AlertType.Warning, "O chamado foi avaliado");
-            return RedirectToAction(nameof(Details), id);
+            return RedirectToDetaits(id);
         }
 
         [HttpPost]
@@ -246,7 +261,7 @@ namespace Web.Controllers
             if (issue.Owner.Id != user.Id && issue.Responsible?.Id != user.Id && !_authUser.HasPermission(this, PermissionType.IssueClose))
             {
                 AddAlert(Models.AlertType.Danger, "Desculpe, mas você não pode executar esta ação");
-                return RedirectToAction(nameof(Details), id);
+                return RedirectToDetaits(id);
             }
 
             issue.Comments.Add(new IssuesComment
@@ -259,7 +274,7 @@ namespace Web.Controllers
             await _issueDAO.Save(issue);
 
             AddAlert(Models.AlertType.Warning, "Comentário adicionado com sucesso");
-            return RedirectToAction(nameof(Details), id);
+            return RedirectToDetaits(id);
         }
 
         private async Task PutCategoriesInView()
@@ -273,6 +288,11 @@ namespace Web.Controllers
         private async Task<bool> IssueExists(int id)
         {
             return await _issueDAO.FindOrDefault(id) != null;
+        }
+
+        private IActionResult RedirectToDetaits(int idValue)
+        {
+            return RedirectToAction(nameof(Details), new {id = idValue});
         }
     }
 }

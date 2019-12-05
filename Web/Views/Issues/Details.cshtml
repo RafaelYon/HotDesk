@@ -12,7 +12,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <div class="row">
             <div class="col-md-8">
                 <h4>
@@ -54,25 +54,29 @@
                 </div>
             </div>
         }
-        <div class="row">
-            <div class="col-md-10 offset-md-2">
-                <form asp-action="Comment">
-                    <div class="form-group">
-                        <label for="comment">Comentário</label>
-                        <textarea class="form-control" name="comment" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </div>
-                </form>
+        @if (ViewBag.CanComment)
+        {
+            <div class="row">
+                <div class="col-md-10 offset-md-2">
+                    <form asp-action="Comment">
+                        <div class="form-group">
+                            <label for="comment">Comentário</label>
+                            <textarea class="form-control" name="comment" required></textarea>
+                        </div>
+                        <input type="hidden" value="@Model.Id" name="id" />
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        }
     </div>
-    <div class="col-md-4">
-        <div class="row">
+    <div class="col-md-2">
+        <div class="row text-center">
         @if (ViewBag.CanAssign)
         {
-            <div class="col">
+            <div class="col-md-12 p-2">
                 <form asp-action="Assign">
                     <input type="hidden" value="@Model.Id" name="id" />
                     <button class="btn btn-primary" type="submit">Assumir</button>
@@ -81,7 +85,7 @@
         }
         @if (ViewBag.CanClose)
         {
-            <div class="col">
+            <div class="col-md-12 p-2">
                 <form asp-action="Close">
                     <input type="hidden" value="@Model.Id" name="id" />
                     <button class="btn btn-secondary" type="submit">Encerrar</button>
@@ -90,7 +94,7 @@
         }
         @if (ViewBag.CanRate)
         {
-            <div class="col">
+            <div class="col-md-12 p-2">
                 <form asp-action="Rate">
                     <input type="hidden" value="@Model.Id" name="id" />
                     <input type="number" step=".01" name="rate" class="form-control" required/>

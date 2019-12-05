@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Domain;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Web.Helpers;
 using Web.Models;
 using MicrosoftMVC = Microsoft.AspNetCore.Mvc;
@@ -18,7 +21,7 @@ namespace Web.Controllers
 
 		protected void AddAlert(Alert alert)
 		{
-			TempData[ALERT_KEY] = alert;
+			TempData[ALERT_KEY] = JsonConvert.SerializeObject(alert);
 		}
 
 		protected void AddAlert(AlertType type, string content)
@@ -45,5 +48,32 @@ namespace Web.Controllers
         {
             return RedirectToAction("Login", "User");
         }
-	}
+
+		[NonAction]
+        public override ViewResult View()
+		{
+			PutManagePermissionsOnView();
+
+			return base.View();
+		}
+
+		[NonAction]
+        public override ViewResult View(object model)
+		{
+			PutManagePermissionsOnView();
+
+			return base.View(model);
+		}
+
+        protected void PutManagePermissionsOnView()
+        {
+			try
+			{
+				ViewBag.CanManageAccounts = _authUser.HasPermission(this, PermissionType.ManageAccounts);
+				ViewBag.CanManageCategories = _authUser.HasPermission(this, PermissionType.ManageCategories);
+				ViewBag.CanManageGroups = _authUser.HasPermission(this, PermissionType.ManageGroups);
+			}
+			catch (Exception) { }
+        }
+    }
 }

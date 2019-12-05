@@ -1,5 +1,10 @@
 ﻿@{
-    Web.Models.Alert alert = TempData["Alert"] as Web.Models.Alert;
+    Web.Models.Alert alert = null;
+
+    if (TempData["Alert"] != null)
+    {
+        alert = JsonConvert.DeserializeObject<Web.Models.Alert>(TempData["Alert"] as String);
+    }
 }
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -29,8 +34,8 @@
 
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Issues" asp-action="Index">Chamados</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
@@ -49,6 +54,33 @@
                 }
                 else
                 {
+                    @if (ViewBag.CanManageAccounts)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="User" asp-action="All">
+                                Gerenciar Contas
+                            </a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CanManageCategories)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Categories" asp-action="Index">
+                                Gerenciar categorias
+                            </a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CanManageGroups)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Groups" asp-action="Index">
+                                Gerenciar grupos
+                            </a>
+                        </li>
+                    }
+
                     <li class="nav-item">
                         <form asp-controller="User" asp-action="Logout">
                             <button type="submit" class="btn">

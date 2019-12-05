@@ -23,7 +23,6 @@ namespace Domain
         public string Description { get; set; }
 
         [Display(Name = "Categoria")]
-        [Required(ErrorMessage = "Campo obrigatório")]
         public virtual Category Category { get; set; }
 
         [Display(Name = "Avaliação")]
