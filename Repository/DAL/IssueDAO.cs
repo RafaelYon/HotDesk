@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace Repository.DAL
 {
@@ -34,6 +35,19 @@ namespace Repository.DAL
         public async Task<List<Issue>> GetAllOrderned()
         {
             return await GetDbSet().OrderBy(x => x.CreatedAt).ToListAsync();
+        }
+
+        public async Task<List<Issue>> GetBystatus(IssueStatus status)
+        {
+            return await GetDbSet().Where(x => x.Status == status).ToListAsync();
+        }
+
+        public async Task<dynamic> GetRates()
+        {
+            return await GetDbSet()
+                .GroupBy(x => new { Id = x.Responsible.Id })
+                .Select(x => new { Responsible = x.Key.Id, Average = x.Average(p => p.Rate) })
+                .ToListAsync();
         }
     }
 }

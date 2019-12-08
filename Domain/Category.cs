@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain
@@ -9,6 +10,10 @@ namespace Domain
         [Required(AllowEmptyStrings = false, ErrorMessage = "Campo obrigatório")]
         public string Name { get; set; }
 
+        [Display(Name = "Descrição")]
+        public string Description { get; set; }
+
+        [JsonIgnore]
         public virtual List<Issue> Issues { get; set; }
 
         public Category()

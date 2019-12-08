@@ -10,9 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-// using Domain;
-// using Repository;
-// using Repository.DAL;
+using Repository;
+using Repository.DAL;
 
 namespace API
 {
@@ -28,14 +27,14 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddDbContext<Context>
-			// 	(options => options
-			// 		.UseSqlServer(Configuration.GetConnectionString("Docker"))
-			// 		.UseLazyLoadingProxies());
+            services.AddDbContext<Context>
+                (options => options
+                    .UseSqlServer(Configuration.GetConnectionString("RW"))
+                    .UseLazyLoadingProxies());
 
-			// services.AddScoped<CategoryDAO>();
-            // services.AddScoped<IssueDAO>();
-            
+            services.AddScoped<CategoryDAO>();
+            services.AddScoped<IssueDAO>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -47,7 +46,13 @@ namespace API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseMvc(routes => 
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Issues}/{action=Get}/{status?}"
+                );
+            });
         }
     }
 }

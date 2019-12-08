@@ -24,6 +24,11 @@ namespace Domain
             GroupUser = new List<GroupUser>();
         }
 
+        public void ResetPermissions()
+        {
+            GroupPermissions = new List<GroupPermission>();
+        }
+
         public List<Permission> GetPermissions()
         {
             return GroupPermissions.Select(x => x.Permission).ToList();

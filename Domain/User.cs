@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,6 +23,7 @@ namespace Domain
         [Required(ErrorMessage = "Campo obrigatório")]
         [MinLength(6, ErrorMessage = "A senha deve possuir no mínimo 6 caracteres")]
         [DataType(DataType.Password)]
+        [JsonIgnore]
         public string Password { get; set; }
 
         [Display(Name = "Confirmação de senha")]
@@ -29,16 +31,22 @@ namespace Domain
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "A senhas não concidem")]
         [NotMapped]
+        [JsonIgnore]
         public string ConfirmPassword { get; set; }
 
+        [JsonIgnore]
         public string Image { get; set; }
 
+        [JsonIgnore]
         public virtual List<GroupUser> GroupUser { get; set; }
 
+        [JsonIgnore]
         public virtual List<Issue> IssuesCreated { get; set; }
 
+        [JsonIgnore]
         public virtual List<Issue> IssuesAssigned { get; set; }
 
+        [JsonIgnore]
         public virtual List<IssuesComment> IssuesComments { get; set; }
 
         public User()

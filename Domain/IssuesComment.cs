@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain
 {
@@ -10,6 +11,7 @@ namespace Domain
 
         [Display(Name = "Chamado")]
         [Required(ErrorMessage = "Não é possível criar um comentário sem especificar o chamado desejado")]
+        [JsonIgnore]
         public virtual Issue Issue { get; set; }
 
         [Display(Name = "Autor")]

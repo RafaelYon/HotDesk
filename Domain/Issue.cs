@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -36,6 +37,7 @@ namespace Domain
         [Display(Name = "Responsável")]
         public virtual User Responsible { get; set; }
 
+        [JsonIgnore]
         public virtual List<IssuesComment> Comments { get; set; }
 
         public Issue()

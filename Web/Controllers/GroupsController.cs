@@ -197,17 +197,29 @@ namespace Web.Controllers
 
         private async Task SaveGroup(Group @group, int[] permissions)
         {
+            @group.ResetPermissions();
+
             if (@group.Id == 0)
             {
                 await _groupDAO.Save(@group);
+            }
+            else
+            {
+                var gp = await _context.GroupPermissions.Where(x => x.GroupId == @group.Id && permissions.Contains(x.PermissionId))
+                    .ToListAsync();
+
+                _context.GroupPermissions.RemoveRange(gp);
+                await _context.SaveChangesAsync();
             }
 
             foreach (var permissionId in permissions)
             {
                 @group.GroupPermissions.Add(new GroupPermission
                 {
-                    GroupId = @group.Id,
-                    PermissionId = permissionId
+                    //GroupId = @group.Id,
+                    //PermissionId = permissionId
+                    Group = @group,
+                    Permission = await _context.Permissions.FindAsync(permissionId)
                 });
             }
 

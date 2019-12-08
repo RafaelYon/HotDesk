@@ -10,8 +10,8 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20191203222037_AddedDefaultAdminUser")]
-    partial class AddedDefaultAdminUser
+    [Migration("20191205230301_AddedDescriptionToCategory")]
+    partial class AddedDescriptionToCategory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,8 @@ namespace Repository.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Description");
 
                     b.Property<string>("Name")
                         .IsRequired();
@@ -122,7 +124,7 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CategoryId");
+                    b.Property<int?>("CategoryId");
 
                     b.Property<DateTime>("CreatedAt");
 
@@ -272,8 +274,7 @@ namespace Repository.Migrations
                 {
                     b.HasOne("Domain.Category", "Category")
                         .WithMany("Issues")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("Domain.User", "Owner")
                         .WithMany("IssuesCreated")
